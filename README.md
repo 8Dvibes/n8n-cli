@@ -9,6 +9,8 @@
 
 80+ commands. Auto-updating node catalog (543+ nodes). Multi-instance profiles. Works with n8n Cloud and self-hosted.
 
+![n8n-cli demo](demo.gif)
+
 ```
 $ n8n-cli workflows list --active
 ID                   Active   Name
