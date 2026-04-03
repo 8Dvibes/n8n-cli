@@ -36,6 +36,9 @@ Built by [AI Build Lab](https://aibuildlab.com) -- teaching context engineering 
 ## Install
 
 ```bash
+# From PyPI
+pip install n8n-toolkit
+
 # From GitHub
 pip install git+https://github.com/8Dvibes/n8n-cli.git
 
