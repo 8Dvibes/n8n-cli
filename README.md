@@ -1,13 +1,46 @@
 # n8n-cli
 
-CLI tool for the n8n REST API. Scriptable, pipeable, zero external dependencies.
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![GitHub release](https://img.shields.io/github/v/release/8Dvibes/n8n-cli)](https://github.com/8Dvibes/n8n-cli/releases)
+[![No Dependencies](https://img.shields.io/badge/dependencies-zero-brightgreen.svg)](https://github.com/8Dvibes/n8n-cli)
+
+**Scriptable, pipeable CLI for the n8n REST API. Zero external dependencies.**
+
+80+ commands. Auto-updating node catalog (543+ nodes). Multi-instance profiles. Works with n8n Cloud and self-hosted.
+
+```
+$ n8n-cli workflows list --active
+ID                   Active   Name
+----------------------------------------------------------------------
+0NGypLmiqvKIpwrz     Yes      Gmail: Untrash Email (Multi-Account)
+11zReJylAUZeh2ev     Yes      Update Event - Team
+1Et6fk45FStEU5qc     Yes      Gmail: Remove Label (Multi-Account)
+
+$ n8n-cli nodes search slack
+Node                           Display Name              Description
+------------------------------------------------------------------------------------------
+slack                          Slack                     Consume Slack API
+slackTrigger                   Slack Trigger             Handle Slack events via webhooks
+
+$ n8n-cli --json executions list --status error --limit 3 | jq '.[].id'
+"7322"
+"7316"
+"7310"
+```
+
+Built by [AI Build Lab](https://aibuildlab.com) -- teaching context engineering for agentic systems.
 
 ## Install
 
 ```bash
+# From GitHub
+pip install git+https://github.com/8Dvibes/n8n-cli.git
+
+# From source
+git clone https://github.com/8Dvibes/n8n-cli.git
+cd n8n-cli
 pip install .
-# or for development
-pip install -e .
 ```
 
 ## Quick Start
@@ -195,11 +228,31 @@ Config stored at `~/.n8n-cli.json` (mode 600). Environment variables take priori
 | `N8N_API_KEY` | API key |
 | `N8N_PROFILE` | Profile name to use |
 
+## Why n8n-cli?
+
+| | n8n-cli | MCP Servers | n8n UI |
+|---|---------|-------------|--------|
+| Works from any terminal | Yes | No (needs MCP client) | No |
+| Pipeable / scriptable | Yes | No | No |
+| Multi-instance switching | Yes (`--profile`) | Manual config swap | One at a time |
+| Node catalog with search | Yes (543+ nodes, auto-updating) | Depends on server | Built-in |
+| Works with any AI agent | Yes (Bash) | Claude Code only | Manual |
+| Dependencies | Zero | Node.js + npm | Browser |
+
 ## Requirements
 
 - Python 3.9+
 - No external dependencies (stdlib only)
+- Works with n8n Cloud and self-hosted instances
+
+## Contributing
+
+Issues and PRs welcome. This project uses zero external dependencies by design -- please keep it that way.
 
 ## License
 
-MIT
+MIT -- see [LICENSE](LICENSE)
+
+---
+
+Built by **[AI Build Lab](https://aibuildlab.com)** | [Tyler Fisk](https://github.com/8Dvibes) | [@tyfisk](https://x.com/tyfisk)
