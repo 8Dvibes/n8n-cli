@@ -1,0 +1,174 @@
+"""Webhook operations for n8n-cli."""
+
+import json
+import sys
+from typing import Optional
+
+from .client import N8nClient
+
+
+def test_webhook(
+    client: N8nClient,
+    workflow_id: str,
+    data: Optional[str] = None,
+    method: str = "POST",
+    as_json: bool = False,
+) -> None:
+    """Send a test payload to a webhook workflow.
+
+    Looks up the workflow to find its webhook path, then sends a request.
+    """
+    # First, get the workflow to find the webhook node
+    wf = client.get(f"/workflows/{workflow_id}")
+    nodes = wf.get("nodes", [])
+
+    webhook_node = None
+    for node in nodes:
+        node_type = node.get("type", "")
+        if "webhook" in node_type.lower():
+            webhook_node = node
+            break
+
+    if not webhook_node:
+        print(f"No webhook node found in workflow {workflow_id}.", file=sys.stderr)
+        sys.exit(1)
+
+    # Extract webhook path from node parameters
+    params = webhook_node.get("parameters", {})
+    path = params.get("path", "")
+    node_method = params.get("httpMethod", "POST")
+
+    if not path:
+        print(f"Webhook node found but no path configured.", file=sys.stderr)
+        sys.exit(1)
+
+    # Use the node's configured method unless user explicitly overrides
+    if method == "POST" and node_method != "POST":
+        method = node_method
+
+    # Build the webhook URL structurally (don't use string replace)
+    api_url = client.api_url
+    # Strip /api/v1 from end to get base URL
+    if api_url.endswith("/api/v1"):
+        base = api_url[:-7]
+    elif api_url.endswith("/api/v1/"):
+        base = api_url[:-8]
+    else:
+        # Fallback: try to find /api/ and strip from there
+        idx = api_url.find("/api/")
+        base = api_url[:idx] if idx != -1 else api_url
+    webhook_url = f"{base}/webhook-test/{path}"
+
+    # Parse the data payload
+    payload = None
+    if data:
+        try:
+            payload = json.loads(data)
+        except json.JSONDecodeError:
+            print(f"Invalid JSON data: {data}", file=sys.stderr)
+            sys.exit(1)
+
+    if not as_json:
+        print(f"Workflow:  {wf.get('name')} ({workflow_id})")
+        print(f"Webhook:   {webhook_node.get('name')}")
+        print(f"Path:      {path}")
+        print(f"Method:    {http_method}")
+        print(f"URL:       {webhook_url}")
+        print(f"Sending test request...")
+        print()
+
+    # Send the webhook request
+    import urllib.error
+    import urllib.request as urlreq
+
+    req_data = json.dumps(payload).encode("utf-8") if payload else None
+    headers = {"Content-Type": "application/json"} if payload else {}
+
+    req = urlreq.Request(
+        webhook_url,
+        data=req_data,
+        headers=headers,
+        method=method.upper(),
+    )
+
+    try:
+        import ssl
+        ctx = ssl.create_default_context()
+        with urlreq.urlopen(req, context=ctx, timeout=30) as resp:
+            body = resp.read().decode("utf-8")
+            status = resp.status
+
+            if as_json:
+                try:
+                    result = json.loads(body)
+                    print(json.dumps({"status": status, "response": result}, indent=2))
+                except json.JSONDecodeError:
+                    print(json.dumps({"status": status, "response": body}, indent=2))
+            else:
+                print(f"Status: {status}")
+                try:
+                    result = json.loads(body)
+                    print(f"Response:\n{json.dumps(result, indent=2)}")
+                except json.JSONDecodeError:
+                    print(f"Response:\n{body}")
+
+    except urllib.error.HTTPError as e:
+        body = e.read().decode("utf-8")
+        if as_json:
+            print(json.dumps({"status": e.code, "error": body}, indent=2))
+        else:
+            print(f"Status: {e.code}")
+            print(f"Error: {body}")
+        sys.exit(1)
+    except urllib.error.URLError as e:
+        print(f"Connection error: {e.reason}", file=sys.stderr)
+        print(f"Note: The workflow must be active for production webhooks,", file=sys.stderr)
+        print(f"or have 'Listen for test event' running for test webhooks.", file=sys.stderr)
+        sys.exit(1)
+
+
+def list_webhooks(client: N8nClient, as_json: bool = False) -> None:
+    """List all webhook URLs across active workflows."""
+    workflows = client.paginate("/workflows", params={"active": "true"})
+
+    webhooks = []
+    for wf in workflows:
+        nodes = wf.get("nodes", [])
+        for node in nodes:
+            node_type = node.get("type", "")
+            if "webhook" in node_type.lower() and "respond" not in node_type.lower():
+                params = node.get("parameters", {})
+                path = params.get("path", "")
+                method = params.get("httpMethod", "POST")
+                api_url = client.api_url
+                if api_url.endswith("/api/v1"):
+                    base = api_url[:-7]
+                elif api_url.endswith("/api/v1/"):
+                    base = api_url[:-8]
+                else:
+                    idx = api_url.find("/api/")
+                    base = api_url[:idx] if idx != -1 else api_url
+                if path:
+                    webhooks.append({
+                        "workflow_id": wf.get("id"),
+                        "workflow_name": wf.get("name"),
+                        "node_name": node.get("name"),
+                        "path": path,
+                        "method": method,
+                        "url": f"{base}/webhook/{path}",
+                        "test_url": f"{base}/webhook-test/{path}",
+                    })
+
+    if as_json:
+        print(json.dumps(webhooks, indent=2))
+        return
+
+    if not webhooks:
+        print("No webhook endpoints found in active workflows.")
+        return
+
+    print(f"{'Method':<8} {'Path':<30} {'Workflow'}")
+    print("-" * 75)
+    for wh in webhooks:
+        print(f"{wh['method']:<8} {wh['path']:<30} {wh['workflow_name']}")
+    print(f"\nTotal: {len(webhooks)} webhook(s)")

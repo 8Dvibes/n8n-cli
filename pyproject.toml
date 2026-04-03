@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "n8n-cli"
+version = "0.1.0"
+description = "CLI tool for the n8n REST API — scriptable, pipeable, zero dependencies"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+authors = [
+    {name = "AI Build Lab", email = "tyler@aibuildlab.com"},
+]
+keywords = ["n8n", "automation", "workflow", "cli", "api"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: System :: Systems Administration",
+]
+
+[project.scripts]
+n8n-cli = "n8n_cli.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/8Dvibes/n8n-cli"
+Issues = "https://github.com/8Dvibes/n8n-cli/issues"
+
+[tool.setuptools.packages.find]
+include = ["n8n_cli*"]
