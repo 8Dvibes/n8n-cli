@@ -86,8 +86,9 @@ def get_execution(client: N8nClient, execution_id: str, as_json: bool = False) -
     print(f"Finished:   {ex.get('finished', 'N/A')}")
 
     wf = ex.get("workflowData") or {}
-    if isinstance(wf, dict):
-        print(f"Workflow:   {wf.get('name', 'N/A')} (ID: {wf.get('id', 'N/A')})")
+    wf_id = ex.get("workflowId") or (wf.get("id") if isinstance(wf, dict) else None) or "N/A"
+    wf_name = wf.get("name", "N/A") if isinstance(wf, dict) else "N/A"
+    print(f"Workflow:   {wf_name} (ID: {wf_id})")
 
     # Show error details if failed
     data = ex.get("data", {})
