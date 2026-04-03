@@ -1,6 +1,7 @@
 """Credential operations for n8n-cli."""
 
 import json
+import sys
 from typing import Optional
 
 from .client import N8nClient
@@ -41,8 +42,29 @@ def list_credentials(
 
 
 def get_credential(client: N8nClient, credential_id: str, as_json: bool = False) -> None:
-    """Get a single credential by ID (no secrets returned by API)."""
-    cred = client.get(f"/credentials/{credential_id}")
+    """Get a single credential by ID (no secrets returned by API).
+
+    Note: Some n8n instances (especially cloud) may not support this endpoint.
+    Falls back to filtering the list endpoint.
+    """
+    from .client import N8nApiError
+    try:
+        cred = client.get(f"/credentials/{credential_id}")
+    except N8nApiError as e:
+        if e.status == 405:
+            # Cloud instances don't support GET /credentials/{id}
+            # Fall back to listing all and filtering
+            all_creds = client.paginate("/credentials")
+            cred = None
+            for c in all_creds:
+                if c.get("id") == credential_id:
+                    cred = c
+                    break
+            if not cred:
+                print(f"Credential '{credential_id}' not found.", file=sys.stderr)
+                sys.exit(1)
+        else:
+            raise
 
     if as_json:
         print(json.dumps(cred, indent=2))

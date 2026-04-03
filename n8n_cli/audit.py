@@ -29,18 +29,48 @@ def generate_audit(
         print("Audit completed with no findings.")
         return
 
-    # Parse audit results
+    # n8n returns: {"Category Risk Report": {risk, sections: [{title, description, location: [...]}]}}
     if isinstance(result, dict):
-        for category, findings in result.items():
-            if isinstance(findings, list) and findings:
-                print(f"\n## {category}")
-                print("-" * 40)
-                for finding in findings:
-                    if isinstance(finding, dict):
-                        risk = finding.get("risk", "unknown")
-                        msg = finding.get("message", finding.get("description", ""))
+        finding_count = 0
+        for report_name, report in result.items():
+            if isinstance(report, dict):
+                risk = report.get("risk", "unknown")
+                sections = report.get("sections", [])
+                if sections:
+                    print(f"\n## {report_name}")
+                    print("-" * 50)
+                    for section in sections:
+                        title = section.get("title", "")
+                        desc = section.get("description", "")
+                        locations = section.get("location", [])
+                        count = len(locations) if isinstance(locations, list) else 0
+                        finding_count += count
+                        print(f"\n  {title} ({count} finding{'s' if count != 1 else ''})")
+                        if desc:
+                            print(f"  {desc}")
+                        if isinstance(locations, list):
+                            for loc in locations[:10]:
+                                if isinstance(loc, dict):
+                                    name = loc.get("name", loc.get("id", ""))
+                                    kind = loc.get("kind", loc.get("type", ""))
+                                    print(f"    - {name}" + (f" ({kind})" if kind else ""))
+                                else:
+                                    print(f"    - {loc}")
+                            if count > 10:
+                                print(f"    ... and {count - 10} more")
+            elif isinstance(report, list) and report:
+                print(f"\n## {report_name}")
+                print("-" * 50)
+                for item in report:
+                    if isinstance(item, dict):
+                        risk = item.get("risk", "unknown")
+                        msg = item.get("message", item.get("description", ""))
                         print(f"  [{risk.upper()}] {msg}")
+                        finding_count += 1
                     else:
-                        print(f"  {finding}")
+                        print(f"  {item}")
+                        finding_count += 1
+
+        print(f"\nTotal findings: {finding_count}")
     else:
         print(json.dumps(result, indent=2))
