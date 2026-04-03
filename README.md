@@ -11,11 +11,6 @@
 
 ![n8n-cli demo](demo.gif)
 
-### AI Agent Integration
-
-Works with Claude Code, Cursor, Codex, Gemini, or any agent that can run Bash:
-
-![Agent using n8n-cli](agent-demo.gif)
 
 ```
 $ n8n-cli workflows list --active
