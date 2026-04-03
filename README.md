@@ -250,11 +250,34 @@ Config stored at `~/.n8n-cli.json` (mode 600). Environment variables take priori
 | Works with any AI agent | Yes (Bash) | Claude Code only | Manual |
 | Dependencies | Zero | Node.js + npm | Browser |
 
+## Example Prompts for AI Agents
+
+Don't want to memorize commands? Just tell your AI agent what you need:
+
+> "Check my n8n instance for any failed executions today and tell me what went wrong"
+
+> "Export all my active workflows to a folder for git version control"
+
+> "Build me a workflow that checks a Google Sheet every morning and posts a summary to Slack"
+
+> "Run a security audit and tell me which credentials aren't being used"
+
+See **[EXAMPLES.md](EXAMPLES.md)** for 13 more copy-paste prompts you can hand to Claude Code, Cursor, Codex, or any AI agent.
+
 ## Requirements
 
 - Python 3.9+
 - No external dependencies (stdlib only)
 - Works with n8n Cloud and self-hosted instances
+
+## Support the Project
+
+If this is useful to you, here's how you can help:
+- Star the repo (it helps with discoverability)
+- Fork it and try it out
+- Share it with your n8n community
+- [Sponsor](https://github.com/sponsors/8Dvibes) if you want to support continued development
+- File issues or PRs for features you'd like to see
 
 ## Contributing
 
