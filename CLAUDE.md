@@ -48,7 +48,7 @@ n8n_cli/
 - **Dependency mapping** (3): deps, impact, node-usage
 - **Production ops** (3): meta-monitor, upgrade-preflight, bulk
 - **Testing** (3): test-fixtures, replay, smoke
-- **Bridge to other tools** (4): from-mcp, to-mcp, from-cron, from-zapier
+- **Bridge to other tools** (5): from-mcp, to-mcp, from-cron, from-launchd, from-zapier
 
 Each subdirectory is a skill (e.g. `n8n-cli-status/SKILL.md`). The `skills.py` module reads them via `importlib.resources.files("n8n_cli.skills_data")` so it works from editable installs, wheels, and sdists alike.
 
@@ -95,3 +95,21 @@ n8n-cli --json executions list --status error --limit 5   # Recent failures as J
 - Pagination: cursor-based with `nextCursor` response field and `cursor` query param
 - Rate limits: varies by plan
 - OpenAPI spec: `packages/cli/src/public-api/v1/openapi.yml` in n8n source
+
+## Workflow JSON sanitization (important)
+
+The n8n REST API has a strict whitelist for workflow create/update payloads. JSON returned from `wf get` or `wf export` includes many read-only fields (`id`, `createdAt`, `meta`, `staticData`, `pinData`, `tags`, `triggerCount`, `versionCounter`, `shared`, `activeVersionId`, etc.) plus `settings` keys (`callerPolicy`, `availableInMCP`, `timeSavedMode`) that are rejected on POST/PUT with `HTTP 400: request/body/settings must NOT have additional properties`.
+
+`n8n_cli/workflows.py` has a `_sanitize_workflow_payload()` helper that's applied automatically inside `import_workflow`, `create_workflow`, and `update_workflow`. It uses a whitelist approach:
+
+- **Top-level whitelist**: `{name, nodes, connections, settings}`
+- **Settings whitelist**: `{executionOrder, saveExecutionProgress, saveDataErrorExecution, saveDataSuccessExecution, saveManualExecutions, executionTimeout, errorWorkflow, timezone, callerIds}`
+
+This makes round-trips work transparently: `wf export <id> -o file.json && wf import file.json` produces a valid copy without manual cleanup. **Do not remove this sanitizer** — many skills (template, refactor, migrate, from-cron, from-zapier, from-mcp, meta-monitor) depend on it for round-trip workflows. The sanitizer is idempotent so it's safe on already-clean payloads.
+
+## n8n quirks worth knowing
+
+- **n8n cloud prunes execution history.** The `executions` API only returns the last N executions (typically 7-30 days). "No executions for this workflow" does not mean "this workflow is dead" on cloud. Skills like `/n8n-cli-cleanup`, `/n8n-cli-cost`, and `/n8n-cli-bulk` document this caveat.
+- **`wf set-tags` requires at least one tag ID.** It cannot clear all tags. To clear, PUT an empty array directly to `/workflows/{id}/tags` via the API.
+- **`wf set-tags` REPLACES, not appends.** To add a tag, fetch existing tags first, combine, then set the combined list.
+- **`packages list` returns HTTP 404** on n8n's REST API on both cloud and self-hosted. The community-packages endpoint is not part of the public API. Skills that need this info (e.g. `/n8n-cli-upgrade-preflight`) prompt the user manually.

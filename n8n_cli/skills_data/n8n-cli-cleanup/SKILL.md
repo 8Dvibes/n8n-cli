@@ -78,3 +78,7 @@ Sweep an n8n instance for dead, orphaned, or low-value resources and produce a t
 - Run with `--profile cloud` and `--profile hostinger` separately if the user has multiple instances — never mix findings across instances.
 - A workflow with zero executions might still be valuable (manual-trigger workflows, rarely-used utilities). Flag these but err on the side of "investigate" not "delete".
 - Some credentials are shared across workflows that haven't been imported yet — be careful with credential cleanup recommendations on instances that are mid-migration.
+
+## ⚠️ n8n cloud execution retention
+
+n8n cloud prunes execution history (typically 7-30 days depending on plan). When detecting "dead workflows" via `exec list --workflow-id <id>`, an empty result does NOT necessarily mean the workflow is dead — its executions may have been pruned. Cross-reference with the workflow's `triggerCount`, `updatedAt`, and tag/project context before recommending archival or deletion. Always frame findings as "investigate" not "delete" for instances on cloud.

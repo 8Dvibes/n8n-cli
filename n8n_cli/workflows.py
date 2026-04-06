@@ -7,6 +7,45 @@ from typing import Optional
 from .client import N8nClient
 
 
+# Whitelist of top-level workflow fields the n8n create/update API accepts.
+# Workflow JSON returned from GET contains many read-only fields that the API
+# rejects on POST/PUT. Sanitize to this whitelist to make round-trips work.
+_ALLOWED_TOP_LEVEL = {"name", "nodes", "connections", "settings"}
+
+# Whitelist of settings keys the n8n create API accepts. Anything else returns
+# HTTP 400 "request/body/settings must NOT have additional properties".
+_ALLOWED_SETTINGS = {
+    "executionOrder",
+    "saveExecutionProgress",
+    "saveDataErrorExecution",
+    "saveDataSuccessExecution",
+    "saveManualExecutions",
+    "executionTimeout",
+    "errorWorkflow",
+    "timezone",
+    "callerIds",
+}
+
+
+def _sanitize_workflow_payload(data: dict) -> dict:
+    """Strip fields that the n8n create/update API doesn't accept.
+
+    Returns a NEW dict with only whitelisted top-level fields and a sanitized
+    settings sub-dict. Idempotent - safe to call on already-clean payloads.
+    """
+    cleaned = {k: v for k, v in data.items() if k in _ALLOWED_TOP_LEVEL}
+    # Ensure required fields exist (n8n rejects payloads missing 'settings')
+    if "settings" not in cleaned:
+        cleaned["settings"] = {"executionOrder": "v1"}
+    else:
+        cleaned["settings"] = {
+            k: v for k, v in cleaned["settings"].items() if k in _ALLOWED_SETTINGS
+        }
+        if "executionOrder" not in cleaned["settings"]:
+            cleaned["settings"]["executionOrder"] = "v1"
+    return cleaned
+
+
 def list_workflows(
     client: N8nClient,
     active: Optional[bool] = None,
@@ -79,6 +118,7 @@ def create_workflow(client: N8nClient, file_path: str, as_json: bool = False) ->
     with open(file_path) as f:
         data = json.load(f)
 
+    data = _sanitize_workflow_payload(data)
     result = client.post("/workflows", body=data)
 
     if as_json:
@@ -93,6 +133,7 @@ def update_workflow(client: N8nClient, workflow_id: str, file_path: str, as_json
     with open(file_path) as f:
         data = json.load(f)
 
+    data = _sanitize_workflow_payload(data)
     result = client.put(f"/workflows/{workflow_id}", body=data)
 
     if as_json:
@@ -153,13 +194,19 @@ def import_workflow(
     activate: bool = False,
     as_json: bool = False,
 ) -> None:
-    """Import a workflow from a JSON file, optionally activating it."""
+    """Import a workflow from a JSON file, optionally activating it.
+
+    Sanitizes the payload to only include fields the n8n REST API accepts.
+    Workflow JSON fetched via `wf get` or `wf export` contains many read-only
+    fields (id, createdAt, versionId, etc.) plus settings keys that aren't
+    allowed in create payloads (callerPolicy, availableInMCP, timeSavedMode).
+    Sending those returns HTTP 400. We strip them here so the same JSON can
+    roundtrip cleanly.
+    """
     with open(file_path) as f:
         data = json.load(f)
 
-    # Strip fields that shouldn't be in a create payload
-    for key in ("id", "createdAt", "updatedAt", "versionId"):
-        data.pop(key, None)
+    data = _sanitize_workflow_payload(data)
 
     result = client.post("/workflows", body=data)
     wf_id = result.get("id")
