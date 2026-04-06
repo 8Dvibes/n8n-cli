@@ -248,3 +248,159 @@ def cmd_path(as_json: bool = False) -> None:
         print(json.dumps({"install_dir": str(target), "exists": target.is_dir()}, indent=2))
     else:
         print(target)
+
+
+# ── Doctor ───────────────────────────────────────────────────────────
+
+def cmd_doctor(as_json: bool = False) -> None:
+    """Validate every bundled SKILL.md against the live CLI surface.
+
+    For each skill, extract every `n8n-cli ...` invocation and check that
+    the subcommand path and flags reference real CLI commands. Catches
+    typos, drift between docs and code, and copy-paste mistakes in
+    user-authored skills.
+    """
+    import argparse as _argparse
+    import re as _re
+    from . import cli as _cli_mod
+
+    # Walk the parser to collect every leaf command path → set of valid flags
+    def _collect(parser, prefix="", out=None):
+        if out is None:
+            out = {}
+        for action in parser._actions:
+            if isinstance(action, _argparse._SubParsersAction):
+                for name, sub in action.choices.items():
+                    path = f"{prefix} {name}".strip()
+                    has_subs = any(
+                        isinstance(a, _argparse._SubParsersAction) for a in sub._actions
+                    )
+                    if has_subs:
+                        _collect(sub, path, out)
+                    else:
+                        flags = set()
+                        for sa in sub._actions:
+                            if isinstance(sa, _argparse._SubParsersAction):
+                                continue
+                            for opt in sa.option_strings:
+                                if opt not in ("-h", "--help"):
+                                    flags.add(opt)
+                        out[path] = flags
+        return out
+
+    leafs = _collect(_cli_mod.build_parser())
+    global_flags = {"-p", "--profile", "--json", "-v", "--version", "-h", "--help"}
+    top_groups = {
+        "health", "discover", "config", "workflows", "wf", "executions",
+        "exec", "credentials", "creds", "tags", "variables", "vars",
+        "projects", "users", "audit", "source-control", "sc", "packages",
+        "pkg", "nodes", "webhooks", "wh", "skills",
+    }
+
+    def _parse_invocation(line):
+        line = line.strip().strip("`").strip("$").strip()
+        if not line.startswith("n8n-cli"):
+            return None, []
+        parts = line.split()[1:]
+        cleaned = []
+        skip_next = False
+        for tok in parts:
+            if skip_next:
+                skip_next = False
+                continue
+            if tok in ("-p", "--profile"):
+                skip_next = True
+                continue
+            if tok in global_flags or tok.startswith("--profile="):
+                continue
+            cleaned.append(tok)
+        if not cleaned or cleaned[0] not in top_groups:
+            return None, []
+        for n in range(min(3, len(cleaned)), 0, -1):
+            candidate = " ".join(cleaned[:n])
+            if candidate in leafs:
+                rest = cleaned[n:]
+                used_flags = []
+                for t in rest:
+                    if t.startswith("--"):
+                        used_flags.append(t.split("=")[0])
+                    elif t.startswith("-") and len(t) > 1 and not t[1:].isdigit():
+                        used_flags.append(t)
+                return candidate, used_flags
+        return None, []
+
+    # Walk every bundled skill and check it
+    bundled_root = _bundled_root()
+    skill_results = []
+    for entry in sorted(bundled_root.iterdir(), key=lambda e: e.name):
+        if not entry.is_dir():
+            continue
+        skill_file = entry / SKILL_FILENAME
+        if not skill_file.is_file():
+            continue
+        text = skill_file.read_text(encoding="utf-8")
+        bad_cmds = []
+        bad_flags = []
+        invocation_count = 0
+        for ln, line in enumerate(text.splitlines(), 1):
+            if "n8n-cli" not in line:
+                continue
+            for m in _re.finditer(r"`?(n8n-cli[^`\n]*)`?", line):
+                inv = m.group(1).rstrip("`").rstrip()
+                inv = _re.split(r"[.,;:)]", inv)[0]
+                cmd, flags_used = _parse_invocation(inv)
+                tokens = inv.split()[1:]
+                tc = [
+                    t for t in tokens
+                    if not t.startswith("-")
+                    and t not in ("--profile", "--json", "-p", "-v")
+                ]
+                if not tc or tc[0] not in top_groups:
+                    continue
+                invocation_count += 1
+                if cmd is None:
+                    bad_cmds.append({"line": ln, "invocation": inv})
+                    continue
+                valid_flags = leafs.get(cmd, set())
+                for f in flags_used:
+                    if f not in valid_flags and f not in global_flags:
+                        bad_flags.append({"line": ln, "command": cmd, "flag": f, "invocation": inv})
+        skill_results.append({
+            "name": entry.name,
+            "invocations_checked": invocation_count,
+            "bad_commands": bad_cmds,
+            "bad_flags": bad_flags,
+            "ok": not bad_cmds and not bad_flags,
+        })
+
+    total = len(skill_results)
+    passing = sum(1 for r in skill_results if r["ok"])
+    failing = total - passing
+
+    if as_json:
+        print(json.dumps({
+            "total": total,
+            "passing": passing,
+            "failing": failing,
+            "results": skill_results,
+        }, indent=2))
+        return
+
+    print(f"Skills doctor — checked {total} bundled skills")
+    print(f"  Passing: {passing}")
+    print(f"  Failing: {failing}")
+    print()
+    if failing == 0:
+        print("✅ All skills reference only valid n8n-cli commands and flags.")
+        return
+    for r in skill_results:
+        if r["ok"]:
+            continue
+        print(f"❌ {r['name']}")
+        for b in r["bad_commands"]:
+            print(f"    line {b['line']}: unknown command in: {b['invocation']}")
+        for b in r["bad_flags"]:
+            print(f"    line {b['line']}: command `{b['command']}` uses unknown flag `{b['flag']}`")
+            print(f"      in: {b['invocation']}")
+        print()
+    sys.exit(1)

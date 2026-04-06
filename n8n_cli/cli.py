@@ -492,6 +492,16 @@ def cmd_skills_path(args):
     _skills.cmd_path(as_json=_json(args))
 
 
+def cmd_skills_doctor(args):
+    from . import skills as _skills
+    _skills.cmd_doctor(as_json=_json(args))
+
+
+def cmd_workflows_clear_tags(args):
+    from .workflows import clear_workflow_tags
+    clear_workflow_tags(_client(args), args.id, as_json=_json(args))
+
+
 # ── Parser Builder ───────────────────────────────────────────────────
 
 def build_parser() -> argparse.ArgumentParser:
@@ -608,6 +618,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("id", help="Workflow ID")
     p.add_argument("tag_ids", nargs="+", help="Tag IDs to set")
     p.set_defaults(func=cmd_workflows_set_tags)
+
+    p = wf_sub.add_parser("clear-tags", help="Remove all tags from a workflow")
+    p.add_argument("id", help="Workflow ID")
+    p.set_defaults(func=cmd_workflows_clear_tags)
 
     # ── executions ──
     ex = sub.add_parser("executions", aliases=["exec"], help="Execution operations")
@@ -866,6 +880,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sk_sub.add_parser("path", help="Print the install target directory")
     p.set_defaults(func=cmd_skills_path)
+
+    p = sk_sub.add_parser(
+        "doctor",
+        help="Validate every bundled SKILL.md against the live CLI surface",
+    )
+    p.set_defaults(func=cmd_skills_doctor)
 
     return parser
 

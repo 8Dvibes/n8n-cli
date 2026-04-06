@@ -110,6 +110,6 @@ This makes round-trips work transparently: `wf export <id> -o file.json && wf im
 ## n8n quirks worth knowing
 
 - **n8n cloud prunes execution history.** The `executions` API only returns the last N executions (typically 7-30 days). "No executions for this workflow" does not mean "this workflow is dead" on cloud. Skills like `/n8n-cli-cleanup`, `/n8n-cli-cost`, and `/n8n-cli-bulk` document this caveat.
-- **`wf set-tags` requires at least one tag ID.** It cannot clear all tags. To clear, PUT an empty array directly to `/workflows/{id}/tags` via the API.
+- **`wf set-tags` requires at least one tag ID.** It cannot clear all tags. Use `wf clear-tags <id>` (added in v0.4.1) to remove all tags from a workflow.
 - **`wf set-tags` REPLACES, not appends.** To add a tag, fetch existing tags first, combine, then set the combined list.
 - **`packages list` returns HTTP 404** on n8n's REST API on both cloud and self-hosted. The community-packages endpoint is not part of the public API. Skills that need this info (e.g. `/n8n-cli-upgrade-preflight`) prompt the user manually.

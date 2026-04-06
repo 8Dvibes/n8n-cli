@@ -187,6 +187,7 @@ unarchive <id>
 transfer <id> <project-id>
 tags <id>
 set-tags <id> <tag-id> [tag-id...]
+clear-tags <id>
 ```
 
 ### Executions (`executions` / `exec`)
@@ -286,6 +287,7 @@ list                                  List bundled skills + install status
 install [name...] [--force]           Install skills into ~/.claude/skills/
 uninstall <name> [name...]            Remove installed skills
 path                                  Print install target directory
+doctor                                Validate every bundled SKILL.md against the live CLI surface
 ```
 
 ### Other
