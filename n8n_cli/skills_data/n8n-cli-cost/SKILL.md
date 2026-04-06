@@ -79,3 +79,7 @@ Pull execution counts grouped by workflow and surface the top consumers, suspici
 - n8n's billing model varies (cloud vs self-hosted). On cloud, "executions" = billed units. On self-hosted, the cost is CPU/RAM/DB writes. Tailor the framing accordingly.
 - A "spammer" with 100% success rate at 60s cadence might actually be intentional polling. Always frame as "is this what you wanted?" not "this is broken".
 - If the user is on a metered plan and asks for a forecast, multiply the daily average by 30 and show the projected monthly bill in execution units.
+
+## ⚠️ n8n cloud execution retention caveat
+
+n8n cloud only retains the last N executions in its API (varies by plan, typically 7-30 days). The cost analysis in this skill is based on what's currently in the API window, NOT lifetime totals. If a workflow ran 10,000 times last month but its executions have been pruned, this skill won't see them. For accurate billing analysis on cloud, cross-reference with n8n's billing dashboard. For self-hosted, the analysis is more complete because executions are retained until manually pruned.

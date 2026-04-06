@@ -7,7 +7,7 @@
 
 **Scriptable, pipeable CLI for the n8n REST API. Zero external dependencies.**
 
-80+ commands. Auto-updating node catalog (543+ nodes). Multi-instance profiles. Works with n8n Cloud and self-hosted. Ships with 32 Claude Code skills.
+80+ commands. Auto-updating node catalog (543+ nodes). Multi-instance profiles. Works with n8n Cloud and self-hosted. Ships with 33 Claude Code skills.
 
 ![n8n-cli demo](demo.gif)
 
@@ -77,13 +77,13 @@ n8n-cli workflows import workflow.json --activate
 
 ## Claude Code Skills
 
-n8n-cli ships with **32 [Claude Code skills](https://docs.claude.com/claude-code)** -- pre-built slash commands that teach Claude Code how to drive n8n-cli for common workflows. Once installed, you can type `/n8n-cli-status`, `/n8n-cli-debug`, `/n8n-cli-create` etc. inside any Claude Code session and Claude will execute the right `n8n-cli` commands for you.
+n8n-cli ships with **33 [Claude Code skills](https://docs.claude.com/claude-code)** -- pre-built slash commands that teach Claude Code how to drive n8n-cli for common workflows. Once installed, you can type `/n8n-cli-status`, `/n8n-cli-debug`, `/n8n-cli-create` etc. inside any Claude Code session and Claude will execute the right `n8n-cli` commands for you.
 
 ```bash
 # See what's bundled and what's already installed
 n8n-cli skills list
 
-# Install all 32 into ~/.claude/skills/
+# Install all 33 into ~/.claude/skills/
 n8n-cli skills install
 
 # Install just one
@@ -163,6 +163,7 @@ After installing, restart Claude Code (or open a new session) and the slash comm
 | `/n8n-cli-from-mcp` | Convert an MCP server or Claude Code skill into the equivalent n8n workflow |
 | `/n8n-cli-to-mcp` | Wrap an n8n workflow as an agent-callable tool (MCP, OpenAI function, Anthropic tool, or HTTP) |
 | `/n8n-cli-from-cron` | Read a crontab and generate equivalent n8n workflows for each entry |
+| `/n8n-cli-from-launchd` | macOS-specific: read launchd plists and generate equivalent n8n workflows |
 | `/n8n-cli-from-zapier` | Migrate a Zapier zap to an equivalent n8n workflow |
 
 The skills install to `~/.claude/skills/` by default. Override with `CLAUDE_SKILLS_DIR=/some/path n8n-cli skills install`.

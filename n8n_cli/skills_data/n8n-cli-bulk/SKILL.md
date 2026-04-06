@@ -78,3 +78,11 @@ Run safe bulk operations against n8n with mandatory dry-run-first behavior.
 - For project reorgs, suggest doing the move in chunks by tag rather than all at once
 - For "deactivate everything tagged dev before going home", that's a great quality-of-life flow — make it a one-liner the user can save
 - If the user has 500+ workflows, even the dry-run is slow. Show a progress bar during the dry-run scan.
+
+## Important n8n quirks to know
+
+1. **n8n cloud prunes execution history.** Only the last N executions are retained (varies by plan, typically 7-30 days). For `archive-by-age` operations, "no recent executions in the API" does NOT necessarily mean "the workflow is dead" — it might just mean the executions have been pruned. Always cross-reference with the workflow's `triggerCount` or `updatedAt` timestamp before recommending archival. Surface this caveat in the dry-run output so the user knows.
+
+2. **`wf set-tags` requires at least one tag ID.** You cannot clear all tags via `wf set-tags <id>` (the CLI requires at least one positional arg). To remove ALL tags from a workflow, the workaround is to PUT an empty array directly to `/workflows/{id}/tags` via the n8n API. If you need this often, propose adding a `wf clear-tags` subcommand to n8n-cli.
+
+3. **`wf set-tags` REPLACES existing tags, not appends.** If you want to add a tag without removing existing ones, first fetch current tags with `wf tags <id>`, combine with the new tag, then set the combined list.
