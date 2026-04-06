@@ -7,7 +7,7 @@
 
 **Scriptable, pipeable CLI for the n8n REST API. Zero external dependencies.**
 
-80+ commands. Auto-updating node catalog (543+ nodes). Multi-instance profiles. Works with n8n Cloud and self-hosted.
+80+ commands. Auto-updating node catalog (543+ nodes). Multi-instance profiles. Works with n8n Cloud and self-hosted. Ships with 11 Claude Code skills.
 
 ![n8n-cli demo](demo.gif)
 
@@ -74,6 +74,45 @@ n8n-cli workflows get <id>
 n8n-cli workflows export <id> -o workflow.json
 n8n-cli workflows import workflow.json --activate
 ```
+
+## Claude Code Skills
+
+n8n-cli ships with 11 [Claude Code skills](https://docs.claude.com/claude-code) -- pre-built slash commands that teach Claude Code how to drive n8n-cli for common workflows. Once installed, you can type `/n8n-status`, `/n8n-debug`, `/n8n-create` etc. inside any Claude Code session and Claude will execute the right `n8n-cli` commands for you.
+
+```bash
+# See what's bundled and what's already installed
+n8n-cli skills list
+
+# Install all 11 into ~/.claude/skills/
+n8n-cli skills install
+
+# Install just one
+n8n-cli skills install n8n-cli-status
+
+# Overwrite existing
+n8n-cli skills install --force
+
+# Print the install target
+n8n-cli skills path
+```
+
+After installing, restart Claude Code (or open a new session) and the slash commands appear in your skill picker.
+
+| Skill | What it does |
+|---|---|
+| `/n8n-cli-status` | Health check, active workflows, recent errors -- one-shot dashboard |
+| `/n8n-cli-debug` | Pull failed executions, analyze error patterns, suggest fixes |
+| `/n8n-cli-create` | Describe a workflow in English, Claude builds it and imports it |
+| `/n8n-cli-import` | Import a workflow JSON with guided credential mapping |
+| `/n8n-cli-export` | Export workflows to JSON for git, backup, or migration |
+| `/n8n-cli-monitor` | Watch the execution stream and alert on failures |
+| `/n8n-cli-migrate` | Move workflows between cloud and self-hosted (with credential remapping) |
+| `/n8n-cli-backup` | Full instance backup to a git-tracked directory |
+| `/n8n-cli-diff` | Compare workflows between instances or against local JSON |
+| `/n8n-cli-webhook-test` | Send test payloads to webhook workflows |
+| `/n8n-cli-creds` | Credential gap analysis -- find what's missing for a workflow |
+
+The skills install to `~/.claude/skills/` by default. Override with `CLAUDE_SKILLS_DIR=/some/path n8n-cli skills install`.
 
 ## Commands
 
@@ -184,6 +223,15 @@ The node catalog downloads from official n8n npm packages and auto-checks for up
 ```
 list                                  List all webhook URLs from active workflows
 test <workflow-id> [--data '{}'] [--method POST]
+```
+
+### Skills (Claude Code)
+
+```
+list                                  List bundled skills + install status
+install [name...] [--force]           Install skills into ~/.claude/skills/
+uninstall <name> [name...]            Remove installed skills
+path                                  Print install target directory
 ```
 
 ### Other

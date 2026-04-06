@@ -22,6 +22,8 @@ n8n_cli/
   cli.py          -- argparse CLI entrypoint, all subcommand routing
   client.py       -- urllib-based REST client (GET/POST/PUT/PATCH/DELETE + pagination)
   config.py       -- Multi-profile config (~/.n8n-cli.json) with env var overrides
+  skills.py       -- Bundled Claude Code skills installer (list/install/uninstall/path)
+  skills_data/    -- 11 SKILL.md files shipped as package data
   workflows.py    -- Workflow CRUD + export/import/activate/archive/transfer
   executions.py   -- Execution history, retry, stop, error analysis
   credentials.py  -- Credential listing + schema lookup
@@ -35,6 +37,14 @@ n8n_cli/
   source_control.py    -- Source control pull
   community_packages.py -- Community package management
 ```
+
+## Claude Code skills
+
+`n8n_cli/skills_data/` is the canonical home for the 11 Claude Code skills that ship with the tool. Each subdirectory is a skill (e.g. `n8n-cli-status/SKILL.md`). The `skills.py` module reads them via `importlib.resources.files("n8n_cli.skills_data")` so it works from editable installs, wheels, and sdists alike.
+
+`pyproject.toml` declares `[tool.setuptools.package-data]` to include `**/*.md` (and any future helper files) inside the wheel. **Do not move the skills out of the package** -- moving them to a repo-root `skills/` directory would break PyPI installs.
+
+To add a new skill: drop a new directory under `n8n_cli/skills_data/<skill-name>/` with a `SKILL.md` containing YAML frontmatter (`name`, `description`, `user_invocable: true`). Bump the README skill table and the version in both `pyproject.toml` and `n8n_cli/__init__.py`.
 
 ## Key design decisions
 
