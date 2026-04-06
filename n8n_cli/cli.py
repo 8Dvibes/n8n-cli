@@ -470,6 +470,28 @@ def cmd_webhooks_list(args):
     list_webhooks(_client(args), as_json=_json(args))
 
 
+# ── Skills (Claude Code) ─────────────────────────────────────────────
+
+def cmd_skills_list(args):
+    from . import skills as _skills
+    _skills.cmd_list(as_json=_json(args))
+
+
+def cmd_skills_install(args):
+    from . import skills as _skills
+    _skills.cmd_install(names=args.names, force=args.force, as_json=_json(args))
+
+
+def cmd_skills_uninstall(args):
+    from . import skills as _skills
+    _skills.cmd_uninstall(names=args.names, as_json=_json(args))
+
+
+def cmd_skills_path(args):
+    from . import skills as _skills
+    _skills.cmd_path(as_json=_json(args))
+
+
 # ── Parser Builder ───────────────────────────────────────────────────
 
 def build_parser() -> argparse.ArgumentParser:
@@ -821,6 +843,29 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = wh_sub.add_parser("list", aliases=["ls"], help="List webhook URLs from active workflows")
     p.set_defaults(func=cmd_webhooks_list)
+
+    # ── skills (Claude Code) ──
+    sk = sub.add_parser(
+        "skills",
+        help="Manage bundled Claude Code skills",
+        description="Install, list, and uninstall the Claude Code skills bundled with n8n-cli.",
+    )
+    sk_sub = sk.add_subparsers(dest="skills_cmd")
+
+    p = sk_sub.add_parser("list", aliases=["ls"], help="List bundled skills and installation status")
+    p.set_defaults(func=cmd_skills_list)
+
+    p = sk_sub.add_parser("install", help="Install bundled skills into ~/.claude/skills/")
+    p.add_argument("names", nargs="*", help="Specific skill names (omit to install all)")
+    p.add_argument("--force", action="store_true", help="Overwrite existing installed skills")
+    p.set_defaults(func=cmd_skills_install)
+
+    p = sk_sub.add_parser("uninstall", aliases=["rm"], help="Remove installed skills")
+    p.add_argument("names", nargs="+", help="Skill names to remove")
+    p.set_defaults(func=cmd_skills_uninstall)
+
+    p = sk_sub.add_parser("path", help="Print the install target directory")
+    p.set_defaults(func=cmd_skills_path)
 
     return parser
 
