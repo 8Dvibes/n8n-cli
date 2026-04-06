@@ -272,3 +272,18 @@ def update_workflow_tags(client: N8nClient, workflow_id: str, tag_ids: list, as_
         print(json.dumps(result, indent=2))
         return
     print(f"Updated tags on workflow {workflow_id}")
+
+
+def clear_workflow_tags(client: N8nClient, workflow_id: str, as_json: bool = False) -> None:
+    """Remove ALL tags from a workflow.
+
+    The n8n REST API supports clearing tags by PUTting an empty array to
+    /workflows/{id}/tags. The CLI's `wf set-tags` requires at least one
+    positional argument so it can't be used to clear tags. This is the
+    explicit clear path.
+    """
+    result = client.put(f"/workflows/{workflow_id}/tags", body=[])
+    if as_json:
+        print(json.dumps(result if result else {"cleared": True}, indent=2))
+        return
+    print(f"Cleared all tags from workflow {workflow_id}")
