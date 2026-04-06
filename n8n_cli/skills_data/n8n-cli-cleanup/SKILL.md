@@ -23,7 +23,8 @@ Sweep an n8n instance for dead, orphaned, or low-value resources and produce a t
    - Flag workflows with NO executions ever as "born dead — likely template/test/abandoned"
 
 3. **Find orphaned credentials** — credentials not referenced by any workflow:
-   - For each credential, grep through all workflow JSONs (use `n8n-cli workflows export` or fetch via `wf get <id>`) to find references
+   - **Fast path**: `n8n-cli audit --categories credentials` — n8n's built-in audit returns credentials not used in any workflow AND credentials not used in any active workflow. Use this first.
+   - **Slow path** (if you need to cross-reference workflow names): for each credential, walk all workflow JSONs (`wf list` then `wf get <id>` per workflow) to find references
    - Flag credentials with zero references as orphaned
 
 4. **Find duplicate webhooks** — same path or same node config across multiple workflows. Flag pairs as "potential collision".
