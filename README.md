@@ -7,7 +7,7 @@
 
 **Scriptable, pipeable CLI for the n8n REST API. Zero external dependencies.**
 
-80+ commands. Auto-updating node catalog (543+ nodes). Multi-instance profiles. Works with n8n Cloud and self-hosted. Ships with 11 Claude Code skills.
+80+ commands. Auto-updating node catalog (543+ nodes). Multi-instance profiles. Works with n8n Cloud and self-hosted. Ships with 32 Claude Code skills.
 
 ![n8n-cli demo](demo.gif)
 
@@ -77,13 +77,13 @@ n8n-cli workflows import workflow.json --activate
 
 ## Claude Code Skills
 
-n8n-cli ships with 11 [Claude Code skills](https://docs.claude.com/claude-code) -- pre-built slash commands that teach Claude Code how to drive n8n-cli for common workflows. Once installed, you can type `/n8n-status`, `/n8n-debug`, `/n8n-create` etc. inside any Claude Code session and Claude will execute the right `n8n-cli` commands for you.
+n8n-cli ships with **32 [Claude Code skills](https://docs.claude.com/claude-code)** -- pre-built slash commands that teach Claude Code how to drive n8n-cli for common workflows. Once installed, you can type `/n8n-cli-status`, `/n8n-cli-debug`, `/n8n-cli-create` etc. inside any Claude Code session and Claude will execute the right `n8n-cli` commands for you.
 
 ```bash
 # See what's bundled and what's already installed
 n8n-cli skills list
 
-# Install all 11 into ~/.claude/skills/
+# Install all 32 into ~/.claude/skills/
 n8n-cli skills install
 
 # Install just one
@@ -98,6 +98,8 @@ n8n-cli skills path
 
 After installing, restart Claude Code (or open a new session) and the slash commands appear in your skill picker.
 
+### Core (the 11 originals)
+
 | Skill | What it does |
 |---|---|
 | `/n8n-cli-status` | Health check, active workflows, recent errors -- one-shot dashboard |
@@ -111,6 +113,57 @@ After installing, restart Claude Code (or open a new session) and the slash comm
 | `/n8n-cli-diff` | Compare workflows between instances or against local JSON |
 | `/n8n-cli-webhook-test` | Send test payloads to webhook workflows |
 | `/n8n-cli-creds` | Credential gap analysis -- find what's missing for a workflow |
+
+### Hygiene & governance
+
+| Skill | What it does |
+|---|---|
+| `/n8n-cli-cleanup` | Find dead workflows, orphaned credentials, untagged junk -- triage list with safe-to-delete recommendations |
+| `/n8n-cli-cost` | Execution cost analysis: top consumers, hourly distribution, suspected spammers |
+| `/n8n-cli-schedule-audit` | Audit Schedule Triggers across all workflows, find collisions, suggest a rebalanced schedule |
+| `/n8n-cli-tag-governance` | Find untagged workflows, propose tags based on content, bulk-apply |
+
+### Authoring & refactoring
+
+| Skill | What it does |
+|---|---|
+| `/n8n-cli-document` | Generate human-readable markdown docs from a workflow JSON |
+| `/n8n-cli-template` | Convert a workflow into a reusable template, or instantiate a new workflow from one |
+| `/n8n-cli-refactor` | Analyze a workflow for simplification opportunities and propose a refactor |
+| `/n8n-cli-review` | PR-style code review of workflow changes with risk badges |
+
+### Dependency mapping
+
+| Skill | What it does |
+|---|---|
+| `/n8n-cli-deps` | Build a dependency graph: workflow → sub-workflow → credential → webhook. Output as tree, mermaid, or JSON |
+| `/n8n-cli-impact` | "If I delete X, what breaks?" -- reverse blast-radius analysis |
+| `/n8n-cli-node-usage` | Search across all workflows for usage of a specific node, credential, or pattern |
+
+### Production ops
+
+| Skill | What it does |
+|---|---|
+| `/n8n-cli-meta-monitor` | Generate a meta-workflow inside n8n that monitors all your other workflows and alerts on failures |
+| `/n8n-cli-upgrade-preflight` | Pre-flight check before upgrading n8n: deprecated nodes, breaking changes, package compatibility |
+| `/n8n-cli-bulk` | Safe bulk ops with mandatory dry-run: activate by tag, archive by age, swap credentials, etc. |
+
+### Testing
+
+| Skill | What it does |
+|---|---|
+| `/n8n-cli-test-fixtures` | Generate realistic test payloads for webhook workflows (happy path + edge + error + security) |
+| `/n8n-cli-replay` | Pull a real failed execution, capture its input, replay it deliberately for debugging |
+| `/n8n-cli-smoke` | Define and run a smoke-test suite that verifies critical workflows respond correctly |
+
+### Bridge to other tools
+
+| Skill | What it does |
+|---|---|
+| `/n8n-cli-from-mcp` | Convert an MCP server or Claude Code skill into the equivalent n8n workflow |
+| `/n8n-cli-to-mcp` | Wrap an n8n workflow as an agent-callable tool (MCP, OpenAI function, Anthropic tool, or HTTP) |
+| `/n8n-cli-from-cron` | Read a crontab and generate equivalent n8n workflows for each entry |
+| `/n8n-cli-from-zapier` | Migrate a Zapier zap to an equivalent n8n workflow |
 
 The skills install to `~/.claude/skills/` by default. Override with `CLAUDE_SKILLS_DIR=/some/path n8n-cli skills install`.
 
