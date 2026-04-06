@@ -22,8 +22,8 @@ Scan an n8n instance against a target version and produce a report of what's lik
    - `n8n-cli --json workflows list` → all workflows
    - For each workflow, fetch the full JSON
    - Extract every node `type` and `typeVersion` used across all workflows
-   - `n8n-cli --json packages list` → community packages installed
    - `n8n-cli --json credentials list` → credential types in use
+   - **Community packages**: n8n's public REST API does not expose the installed-packages endpoint, so `n8n-cli packages list` returns 404. Ask the user directly: "What community packages do you have installed? Check Settings → Community nodes in your n8n UI." Compare each one against the target version's compatibility list manually.
 
 4. **Cross-reference**:
 

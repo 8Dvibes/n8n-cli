@@ -65,8 +65,8 @@ Read every workflow's Schedule Trigger, build a calendar view of what fires when
 
 ### How to apply
 For each row in the rebalance table, edit the workflow in the n8n UI or use:
-  n8n-cli wf get <id> -o /tmp/workflow.json
-  # edit the cron field
+  n8n-cli wf export <id> -o /tmp/workflow.json
+  # edit the cron field in /tmp/workflow.json
   n8n-cli wf update <id> /tmp/workflow.json
 ```
 

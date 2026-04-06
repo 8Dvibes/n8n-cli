@@ -43,7 +43,7 @@ Two modes: **extract** a template from an existing workflow, or **instantiate** 
 4. **Save the template**:
    - Default location: `~/n8n-templates/<slug>.json`
    - Or user-specified path
-   - Print a usage example: `n8n-cli skills run n8n-cli-template instantiate ~/n8n-templates/<slug>.json`
+   - Print a usage example: invoke this skill again as `/n8n-cli-template` from inside Claude Code and pass the template path when prompted
 
 ## Mode 2: Instantiate a workflow from a template
 
