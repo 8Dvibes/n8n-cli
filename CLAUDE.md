@@ -40,11 +40,32 @@ n8n_cli/
 
 ## Claude Code skills
 
-`n8n_cli/skills_data/` is the canonical home for the 11 Claude Code skills that ship with the tool. Each subdirectory is a skill (e.g. `n8n-cli-status/SKILL.md`). The `skills.py` module reads them via `importlib.resources.files("n8n_cli.skills_data")` so it works from editable installs, wheels, and sdists alike.
+`n8n_cli/skills_data/` is the canonical home for the 32 Claude Code skills that ship with the tool, organized into 7 categories:
+
+- **Core ops** (11): status, debug, create, import, export, monitor, migrate, backup, diff, webhook-test, creds
+- **Hygiene** (4): cleanup, cost, schedule-audit, tag-governance
+- **Authoring** (4): document, template, refactor, review
+- **Dependency mapping** (3): deps, impact, node-usage
+- **Production ops** (3): meta-monitor, upgrade-preflight, bulk
+- **Testing** (3): test-fixtures, replay, smoke
+- **Bridge to other tools** (4): from-mcp, to-mcp, from-cron, from-zapier
+
+Each subdirectory is a skill (e.g. `n8n-cli-status/SKILL.md`). The `skills.py` module reads them via `importlib.resources.files("n8n_cli.skills_data")` so it works from editable installs, wheels, and sdists alike.
 
 `pyproject.toml` declares `[tool.setuptools.package-data]` to include `**/*.md` (and any future helper files) inside the wheel. **Do not move the skills out of the package** -- moving them to a repo-root `skills/` directory would break PyPI installs.
 
 To add a new skill: drop a new directory under `n8n_cli/skills_data/<skill-name>/` with a `SKILL.md` containing YAML frontmatter (`name`, `description`, `user_invocable: true`). Bump the README skill table and the version in both `pyproject.toml` and `n8n_cli/__init__.py`.
+
+## Skill design principles
+
+When adding new skills, follow these conventions to keep them consistent:
+
+1. **Read-only by default.** Destructive operations (delete, bulk modify) require explicit confirmation. Skills like `/n8n-cli-cleanup` and `/n8n-cli-impact` are designed to surface findings without ever applying them.
+2. **Always show a dry-run before mutations.** `/n8n-cli-bulk` is the canonical example.
+3. **Multi-profile aware.** Skills that target a specific n8n instance should respect the user's `--profile` selection and never mix data across profiles.
+4. **Pair with existing skills.** New skills should reference complementary ones (e.g. `/n8n-cli-impact` uses `/n8n-cli-deps` data; `/n8n-cli-replay` produces fixtures for `/n8n-cli-test-fixtures`).
+5. **Output format: human-readable by default, JSON via `--json` when piping.**
+6. **Cache expensive scans.** Skills that walk every workflow (deps, node-usage) should cache results in `~/.cache/n8n-cli/` so repeat invocations are fast.
 
 ## Key design decisions
 
