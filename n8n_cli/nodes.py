@@ -209,6 +209,17 @@ def ensure_catalog(force: bool = False, quiet: bool = False) -> dict:
 
         index[name] = entry
 
+    # Guard: don't persist empty catalog if all downloads failed
+    if not index:
+        if CATALOG_FILE.exists():
+            if not quiet:
+                print("  Warning: downloads failed, using cached catalog", file=sys.stderr)
+            with open(CATALOG_FILE) as f:
+                return json.load(f)
+        print("Error: Failed to download any node definitions.", file=sys.stderr)
+        print("Check your internet connection or try again later.", file=sys.stderr)
+        sys.exit(1)
+
     catalog = {
         "nodes": index,
         "meta": {

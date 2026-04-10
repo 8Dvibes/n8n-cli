@@ -1,10 +1,27 @@
 """Webhook operations for n8n-cli."""
 
 import json
+import ssl
 import sys
+import urllib.error
+import urllib.request
 from typing import Optional
 
 from .client import N8nClient
+
+
+def _webhook_base_url(api_url: str) -> str:
+    """Derive the webhook base URL from the API URL.
+
+    Strips the /api/v1 suffix to get the instance base URL, which is
+    used to construct webhook and webhook-test URLs.
+    """
+    if api_url.endswith("/api/v1"):
+        return api_url[:-7]
+    elif api_url.endswith("/api/v1/"):
+        return api_url[:-8]
+    idx = api_url.find("/api/")
+    return api_url[:idx] if idx != -1 else api_url
 
 
 def test_webhook(
@@ -46,17 +63,8 @@ def test_webhook(
     if method == "POST" and node_method != "POST":
         method = node_method
 
-    # Build the webhook URL structurally (don't use string replace)
-    api_url = client.api_url
-    # Strip /api/v1 from end to get base URL
-    if api_url.endswith("/api/v1"):
-        base = api_url[:-7]
-    elif api_url.endswith("/api/v1/"):
-        base = api_url[:-8]
-    else:
-        # Fallback: try to find /api/ and strip from there
-        idx = api_url.find("/api/")
-        base = api_url[:idx] if idx != -1 else api_url
+    # Build the webhook URL using the shared helper
+    base = _webhook_base_url(client.api_url)
     webhook_url = f"{base}/webhook-test/{path}"
 
     # Parse the data payload
@@ -72,19 +80,16 @@ def test_webhook(
         print(f"Workflow:  {wf.get('name')} ({workflow_id})")
         print(f"Webhook:   {webhook_node.get('name')}")
         print(f"Path:      {path}")
-        print(f"Method:    {http_method}")
+        print(f"Method:    {method}")
         print(f"URL:       {webhook_url}")
         print(f"Sending test request...")
         print()
 
     # Send the webhook request
-    import urllib.error
-    import urllib.request as urlreq
-
     req_data = json.dumps(payload).encode("utf-8") if payload else None
     headers = {"Content-Type": "application/json"} if payload else {}
 
-    req = urlreq.Request(
+    req = urllib.request.Request(
         webhook_url,
         data=req_data,
         headers=headers,
@@ -92,9 +97,8 @@ def test_webhook(
     )
 
     try:
-        import ssl
         ctx = ssl.create_default_context()
-        with urlreq.urlopen(req, context=ctx, timeout=30) as resp:
+        with urllib.request.urlopen(req, context=ctx, timeout=30) as resp:
             body = resp.read().decode("utf-8")
             status = resp.status
 
@@ -140,14 +144,7 @@ def list_webhooks(client: N8nClient, as_json: bool = False) -> None:
                 params = node.get("parameters", {})
                 path = params.get("path", "")
                 method = params.get("httpMethod", "POST")
-                api_url = client.api_url
-                if api_url.endswith("/api/v1"):
-                    base = api_url[:-7]
-                elif api_url.endswith("/api/v1/"):
-                    base = api_url[:-8]
-                else:
-                    idx = api_url.find("/api/")
-                    base = api_url[:idx] if idx != -1 else api_url
+                base = _webhook_base_url(client.api_url)
                 if path:
                     webhooks.append({
                         "workflow_id": wf.get("id"),
