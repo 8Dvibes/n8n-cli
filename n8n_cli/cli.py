@@ -899,25 +899,35 @@ def main():
     try:
         func(args)
     except N8nApiError as e:
+        error_data = {
+            "error": True,
+            "type": "N8nApiError",
+            "status": e.status,
+            "message": e.message,
+        }
+        if e.recovery_hint:
+            error_data["recovery_hint"] = e.recovery_hint
         if _json(args):
-            print(json.dumps({
-                "error": True,
-                "type": "N8nApiError",
-                "status": e.status,
-                "message": e.message,
-            }, indent=2), file=sys.stderr)
+            print(json.dumps(error_data, indent=2), file=sys.stderr)
         else:
             print(f"Error: HTTP {e.status}: {e.message}", file=sys.stderr)
+            if e.recovery_hint:
+                print(f"Hint:  {e.recovery_hint}", file=sys.stderr)
         sys.exit(1)
     except N8nError as e:
+        error_data = {
+            "error": True,
+            "type": type(e).__name__,
+            "message": str(e),
+        }
+        if e.recovery_hint:
+            error_data["recovery_hint"] = e.recovery_hint
         if _json(args):
-            print(json.dumps({
-                "error": True,
-                "type": type(e).__name__,
-                "message": str(e),
-            }, indent=2), file=sys.stderr)
+            print(json.dumps(error_data, indent=2), file=sys.stderr)
         else:
             print(f"Error: {e}", file=sys.stderr)
+            if e.recovery_hint:
+                print(f"Hint:  {e.recovery_hint}", file=sys.stderr)
         sys.exit(1)
     except FileNotFoundError as e:
         print(f"Error: File not found: {e}", file=sys.stderr)
