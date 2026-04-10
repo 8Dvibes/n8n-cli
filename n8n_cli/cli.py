@@ -5,8 +5,9 @@ import json
 import sys
 
 from . import __version__
-from .client import N8nClient, N8nApiError
+from .client import N8nClient
 from .config import get_profile, require_profile, load_config, save_config
+from .exceptions import N8nError, N8nApiError, N8nConfigError
 
 
 def _client(args) -> N8nClient:
@@ -23,30 +24,23 @@ def _json(args) -> bool:
 
 def cmd_health(args):
     client = _client(args)
-    try:
-        # Try listing workflows with limit=1 as a health check
-        client.get("/workflows", params={"limit": 1})
-        profile = get_profile(getattr(args, "profile", None))
-        if _json(args):
-            print(json.dumps({
-                "status": "ok",
-                "profile": profile["profile_name"],
-                "api_url": profile["api_url"],
-                "workflows_accessible": True,
-            }, indent=2))
-        else:
-            print(f"Status:   OK")
-            print(f"Profile:  {profile['profile_name']}")
-            print(f"API URL:  {profile['api_url']}")
-            print(f"Auth:     Valid")
-    except N8nApiError as e:
-        if _json(args):
-            print(json.dumps({"status": "error", "code": e.status, "message": e.message}, indent=2))
-        else:
-            print(f"Status:   ERROR")
-            print(f"Code:     {e.status}")
-            print(f"Message:  {e.message}")
-        sys.exit(1)
+    # Try listing workflows with limit=1 as a health check.
+    # If the API key is invalid or server is down, N8nApiError or
+    # N8nConnectionError propagates to main()'s central handler.
+    client.get("/workflows", params={"limit": 1})
+    profile = get_profile(getattr(args, "profile", None))
+    if _json(args):
+        print(json.dumps({
+            "status": "ok",
+            "profile": profile["profile_name"],
+            "api_url": profile["api_url"],
+            "workflows_accessible": True,
+        }, indent=2))
+    else:
+        print("Status:   OK")
+        print(f"Profile:  {profile['profile_name']}")
+        print(f"API URL:  {profile['api_url']}")
+        print("Auth:     Valid")
 
 
 # ── Discover ─────────────────────────────────────────────────────────
@@ -118,8 +112,7 @@ def cmd_config_list_profiles(args):
 def cmd_config_use(args):
     config = load_config()
     if args.name not in config.get("profiles", {}):
-        print(f"Error: Profile '{args.name}' not found.", file=sys.stderr)
-        sys.exit(1)
+        raise N8nConfigError(f"Profile '{args.name}' not found.")
     config["default_profile"] = args.name
     save_config(config)
     print(f"Now using profile: {args.name}")
@@ -129,8 +122,7 @@ def cmd_config_delete_profile(args):
     config = load_config()
     profiles = config.get("profiles", {})
     if args.name not in profiles:
-        print(f"Error: Profile '{args.name}' not found.", file=sys.stderr)
-        sys.exit(1)
+        raise N8nConfigError(f"Profile '{args.name}' not found.")
     del profiles[args.name]
     if config.get("default_profile") == args.name:
         config["default_profile"] = next(iter(profiles), "default")
@@ -908,9 +900,24 @@ def main():
         func(args)
     except N8nApiError as e:
         if _json(args):
-            print(json.dumps({"error": True, "status": e.status, "message": e.message}, indent=2), file=sys.stderr)
+            print(json.dumps({
+                "error": True,
+                "type": "N8nApiError",
+                "status": e.status,
+                "message": e.message,
+            }, indent=2), file=sys.stderr)
         else:
             print(f"Error: HTTP {e.status}: {e.message}", file=sys.stderr)
+        sys.exit(1)
+    except N8nError as e:
+        if _json(args):
+            print(json.dumps({
+                "error": True,
+                "type": type(e).__name__,
+                "message": str(e),
+            }, indent=2), file=sys.stderr)
+        else:
+            print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
     except FileNotFoundError as e:
         print(f"Error: File not found: {e}", file=sys.stderr)

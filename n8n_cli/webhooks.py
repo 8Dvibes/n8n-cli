@@ -2,12 +2,12 @@
 
 import json
 import ssl
-import sys
 import urllib.error
 import urllib.request
 from typing import Optional
 
 from .client import N8nClient
+from .exceptions import N8nConnectionError, N8nValidationError
 
 
 def _webhook_base_url(api_url: str) -> str:
@@ -47,8 +47,7 @@ def test_webhook(
             break
 
     if not webhook_node:
-        print(f"No webhook node found in workflow {workflow_id}.", file=sys.stderr)
-        sys.exit(1)
+        raise N8nValidationError(f"No webhook node found in workflow {workflow_id}.")
 
     # Extract webhook path from node parameters
     params = webhook_node.get("parameters", {})
@@ -56,8 +55,7 @@ def test_webhook(
     node_method = params.get("httpMethod", "POST")
 
     if not path:
-        print(f"Webhook node found but no path configured.", file=sys.stderr)
-        sys.exit(1)
+        raise N8nValidationError("Webhook node found but no path configured.")
 
     # Use the node's configured method unless user explicitly overrides
     if method == "POST" and node_method != "POST":
@@ -72,9 +70,8 @@ def test_webhook(
     if data:
         try:
             payload = json.loads(data)
-        except json.JSONDecodeError:
-            print(f"Invalid JSON data: {data}", file=sys.stderr)
-            sys.exit(1)
+        except json.JSONDecodeError as e:
+            raise N8nValidationError(f"Invalid JSON data: {data}") from e
 
     if not as_json:
         print(f"Workflow:  {wf.get('name')} ({workflow_id})")
@@ -123,12 +120,13 @@ def test_webhook(
         else:
             print(f"Status: {e.code}")
             print(f"Error: {body}")
-        sys.exit(1)
+        raise N8nConnectionError(f"Webhook request failed with HTTP {e.code}") from e
     except urllib.error.URLError as e:
-        print(f"Connection error: {e.reason}", file=sys.stderr)
-        print(f"Note: The workflow must be active for production webhooks,", file=sys.stderr)
-        print(f"or have 'Listen for test event' running for test webhooks.", file=sys.stderr)
-        sys.exit(1)
+        raise N8nConnectionError(
+            f"{e.reason}. "
+            "The workflow must be active for production webhooks, "
+            "or have 'Listen for test event' running for test webhooks."
+        ) from e
 
 
 def list_webhooks(client: N8nClient, as_json: bool = False) -> None:

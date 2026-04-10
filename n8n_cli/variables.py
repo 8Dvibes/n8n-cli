@@ -1,10 +1,10 @@
 """Variable operations for n8n-cli."""
 
 import json
-import sys
 from typing import Optional
 
 from .client import N8nClient
+from .exceptions import N8nValidationError
 
 
 def list_variables(client: N8nClient, limit: Optional[int] = None, as_json: bool = False) -> None:
@@ -57,8 +57,7 @@ def update_variable(client: N8nClient, variable_id: str, key: Optional[str] = No
     if value is not None:
         body["value"] = value
     if not body:
-        print("Error: variables update requires --key or --value (or both).", file=sys.stderr)
-        sys.exit(1)
+        raise N8nValidationError("variables update requires --key or --value (or both).")
     result = client.put(f"/variables/{variable_id}", body=body)
     if as_json:
         print(json.dumps(result, indent=2))
