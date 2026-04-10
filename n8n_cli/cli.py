@@ -494,6 +494,35 @@ def cmd_workflows_clear_tags(args):
     clear_workflow_tags(_client(args), args.id, as_json=_json(args))
 
 
+# ── API (raw escape hatch) ──────────────────────────────────────────
+
+def cmd_api(args):
+    """Raw API call to any n8n REST endpoint.
+
+    This is the escape hatch for endpoints the CLI doesn't cover yet.
+    Useful for AI agents that need full API access without waiting for
+    a dedicated command to be added.
+    """
+    client = _client(args)
+    body = None
+    if args.data:
+        body = json.loads(args.data)
+    elif args.data_file:
+        with open(args.data_file) as f:
+            body = json.load(f)
+
+    result = client._request(
+        args.method.upper(),
+        args.path,
+        body=body,
+    )
+
+    if result is not None:
+        print(json.dumps(result, indent=2))
+    else:
+        print("{}")
+
+
 # ── Parser Builder ───────────────────────────────────────────────────
 
 def build_parser() -> argparse.ArgumentParser:
@@ -878,6 +907,25 @@ def build_parser() -> argparse.ArgumentParser:
         help="Validate every bundled SKILL.md against the live CLI surface",
     )
     p.set_defaults(func=cmd_skills_doctor)
+
+    # ── api (raw escape hatch) ──
+    ap = sub.add_parser(
+        "api",
+        help="Raw API call to any n8n REST endpoint",
+        description=(
+            "Send a raw HTTP request to the n8n REST API. "
+            "Use this for endpoints the CLI doesn't cover yet."
+        ),
+    )
+    ap.add_argument("path", help="API path (e.g. /workflows, /executions/123)")
+    ap.add_argument(
+        "-X", "--method", default="GET",
+        choices=["GET", "POST", "PUT", "PATCH", "DELETE"],
+        help="HTTP method (default: GET)",
+    )
+    ap.add_argument("-d", "--data", help="JSON request body (inline string)")
+    ap.add_argument("--data-file", help="JSON request body (read from file)")
+    ap.set_defaults(func=cmd_api)
 
     return parser
 
