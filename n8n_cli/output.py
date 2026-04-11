@@ -143,7 +143,8 @@ class Output:
         print(file=self.stream)
         print(f"  {self.bold(title)}", file=self.stream)
         rule_len = min(len(title) + 4, self.width - 2)
-        print(f"  {self.dim('\u2500' * rule_len)}", file=self.stream)
+        rule_str = self.dim("\u2500" * rule_len)
+        print(f"  {rule_str}", file=self.stream)
 
     def rule(self, char: str = "\u2500") -> None:
         """Horizontal rule spanning available width."""
@@ -213,7 +214,8 @@ class Output:
         # Header
         hdr = _fmt(headers, col_w)
         print(f"  {self.bold(self.cyan(hdr))}", file=self.stream)
-        print(f"  {self.dim('\u2500' * _visible_len(hdr))}", file=self.stream)
+        rule_str = self.dim("\u2500" * _visible_len(hdr))
+        print(f"  {rule_str}", file=self.stream)
 
         # Rows
         for row in str_rows:
