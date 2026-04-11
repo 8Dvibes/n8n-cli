@@ -37,6 +37,7 @@ n8n-cli = "n8n_cli.cli:main"
 [project.urls]
 Homepage = "https://github.com/8Dvibes/n8n-cli"
 Issues = "https://github.com/8Dvibes/n8n-cli/issues"
+Changelog = "https://github.com/8Dvibes/n8n-cli/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 include = ["n8n_cli*"]
