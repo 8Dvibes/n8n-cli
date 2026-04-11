@@ -52,7 +52,7 @@ Two modes: **extract** a template from an existing workflow, or **instantiate** 
 1. **Read the template file**
 2. **Parse `_template.placeholders`** — for each one, prompt the user to fill in
 3. **For credential placeholders**:
-   - List existing credentials of the matching type: `n8n-cli creds list --type <type>`
+   - List existing credentials of the matching type: `n8n-cli --json creds list --type <type>`
    - Let the user pick from the list, or create a new one
 4. **Substitute placeholders** throughout the JSON
 5. **Strip the `_template` block** before import

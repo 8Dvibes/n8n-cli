@@ -19,7 +19,7 @@ Fire test requests at webhook-triggered workflows.
 ### List Available Webhooks
 
 ```bash
-n8n-cli webhooks list
+n8n-cli --json webhooks list
 ```
 
 Shows all webhook endpoints from active workflows with their methods and paths.
