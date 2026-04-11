@@ -498,6 +498,18 @@ def cmd_workflows_clear_tags(args):
     clear_workflow_tags(_client(args), args.id, as_json=_json(args))
 
 
+# ── Completion ──────────────────────────────────────────────────────
+
+def cmd_completion(args):
+    """Print shell completion script."""
+    from .completions import generate_bash, generate_zsh
+    parser = build_parser()
+    if args.shell == "zsh":
+        print(generate_zsh(parser))
+    else:
+        print(generate_bash(parser))
+
+
 def cmd_workflows_validate(args):
     from .workflows import validate_workflow
     validate_workflow(args.file, as_json=_json(args))
@@ -920,6 +932,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="Validate every bundled SKILL.md against the live CLI surface",
     )
     p.set_defaults(func=cmd_skills_doctor)
+
+    # ── completion ──
+    cp = sub.add_parser(
+        "completion",
+        help="Print shell completion script",
+        description="Generate a shell completion script for bash or zsh.",
+    )
+    cp.add_argument(
+        "shell", choices=["bash", "zsh"],
+        help="Shell type (bash or zsh)",
+    )
+    cp.set_defaults(func=cmd_completion)
 
     # ── api (raw escape hatch) ──
     ap = sub.add_parser(
