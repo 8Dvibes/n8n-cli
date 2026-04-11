@@ -6,9 +6,10 @@ Supports multiple named profiles for different n8n instances.
 
 import json
 import os
-import sys
 from pathlib import Path
 from typing import Optional
+
+from .exceptions import N8nConfigError
 
 CONFIG_FILE = Path.home() / ".n8n-cli.json"
 
@@ -81,11 +82,13 @@ def require_profile(profile_name: Optional[str] = None) -> dict:
     """Get profile or exit with error if not configured."""
     p = get_profile(profile_name)
     if not p["api_url"]:
-        print("Error: n8n API URL not configured.", file=sys.stderr)
-        print("Set N8N_API_URL env var or run: n8n-cli config set-profile <name> --url <url> --key <key>", file=sys.stderr)
-        sys.exit(1)
+        raise N8nConfigError(
+            "n8n API URL not configured. "
+            "Set N8N_API_URL env var or run: n8n-cli config set-profile <name> --url <url> --key <key>"
+        )
     if not p["api_key"]:
-        print("Error: n8n API key not configured.", file=sys.stderr)
-        print("Set N8N_API_KEY env var or run: n8n-cli config set-profile <name> --url <url> --key <key>", file=sys.stderr)
-        sys.exit(1)
+        raise N8nConfigError(
+            "n8n API key not configured. "
+            "Set N8N_API_KEY env var or run: n8n-cli config set-profile <name> --url <url> --key <key>"
+        )
     return p
