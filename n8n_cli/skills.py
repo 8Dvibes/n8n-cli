@@ -19,6 +19,8 @@ from typing import Iterable
 # installs alike. Requires Python 3.9+ (matches our pyproject requires-python).
 from importlib.resources import files as _pkg_files
 
+from .exceptions import N8nValidationError
+
 
 SKILLS_PACKAGE = "n8n_cli.skills_data"
 SKILL_FILENAME = "SKILL.md"
@@ -172,12 +174,9 @@ def cmd_install(
         to_install = []
         for n in names:
             if n not in bundled:
-                msg = f"Unknown skill: {n}. Run `n8n-cli skills list` to see available skills."
-                if as_json:
-                    print(json.dumps({"error": msg}, indent=2), file=sys.stderr)
-                else:
-                    print(f"Error: {msg}", file=sys.stderr)
-                sys.exit(1)
+                raise N8nValidationError(
+                    f"Unknown skill: {n}. Run `n8n-cli skills list` to see available skills."
+                )
             to_install.append(n)
 
     results = []
