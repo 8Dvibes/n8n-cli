@@ -107,6 +107,68 @@ The n8n REST API has a strict whitelist for workflow create/update payloads. JSO
 
 This makes round-trips work transparently: `wf export <id> -o file.json && wf import file.json` produces a valid copy without manual cleanup. **Do not remove this sanitizer** — many skills (template, refactor, migrate, from-cron, from-zapier, from-mcp, meta-monitor) depend on it for round-trip workflows. The sanitizer is idempotent so it's safe on already-clean payloads.
 
+## Raw API access
+
+`n8n-cli api` is an escape hatch for any n8n REST endpoint the CLI doesn't cover:
+
+```bash
+n8n-cli api /workflows                                    # GET
+n8n-cli api -X POST /workflows -d '{"name":"Test",...}'   # POST with body
+n8n-cli api -X DELETE /credentials/456                    # DELETE
+n8n-cli api /workflows/789/share                          # Uncovered endpoints
+```
+
+## Workflow validation
+
+`n8n-cli wf validate <file>` checks workflow JSON before import:
+
+```bash
+n8n-cli wf validate workflow.json          # Human-readable
+n8n-cli --json wf validate workflow.json   # Structured JSON for agents
+```
+
+Validates: required fields, node types/names, unique names, connection references, settings whitelist. Works offline (no API connection needed).
+
+## Workflow JSON schema (for agents building workflows)
+
+Minimum valid workflow JSON:
+
+```json
+{
+  "name": "Workflow Name",
+  "nodes": [
+    {
+      "type": "n8n-nodes-base.webhook",
+      "name": "Webhook",
+      "position": [0, 0],
+      "parameters": {}
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
+```
+
+Node types use full prefix: `n8n-nodes-base.{nodeName}` or `@n8n/n8n-nodes-langchain.{nodeName}`. Use `n8n-cli --json nodes get <name> --full` to get the complete property schema for any node.
+
+## Error handling
+
+All errors are structured JSON in `--json` mode:
+
+```json
+{
+  "error": true,
+  "type": "N8nApiError",
+  "status": 401,
+  "message": "unauthorized",
+  "recovery_hint": "API key may be invalid. Check with: n8n-cli config show"
+}
+```
+
+Exception hierarchy: `N8nError` > `N8nApiError`, `N8nConnectionError`, `N8nConfigError`, `N8nCatalogError`, `N8nValidationError`. Each carries a `recovery_hint` for agent self-correction.
+
 ## n8n quirks worth knowing
 
 - **n8n cloud prunes execution history.** The `executions` API only returns the last N executions (typically 7-30 days). "No executions for this workflow" does not mean "this workflow is dead" on cloud. Skills like `/n8n-cli-cleanup`, `/n8n-cli-cost`, and `/n8n-cli-bulk` document this caveat.
