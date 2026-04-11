@@ -37,10 +37,14 @@ def cmd_health(args):
             "workflows_accessible": True,
         }, indent=2))
     else:
-        print("Status:   OK")
-        print(f"Profile:  {profile['profile_name']}")
-        print(f"API URL:  {profile['api_url']}")
-        print("Auth:     Valid")
+        from .output import Output
+        out = Output()
+        out.heading("n8n Health Check")
+        out.success("Connected")
+        out.kv("Profile", profile["profile_name"])
+        out.kv("API URL", profile["api_url"])
+        out.kv("Auth", "Valid")
+        out.blank()
 
 
 # ── Discover ─────────────────────────────────────────────────────────
