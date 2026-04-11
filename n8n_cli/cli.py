@@ -494,6 +494,11 @@ def cmd_workflows_clear_tags(args):
     clear_workflow_tags(_client(args), args.id, as_json=_json(args))
 
 
+def cmd_workflows_validate(args):
+    from .workflows import validate_workflow
+    validate_workflow(args.file, as_json=_json(args))
+
+
 # ── API (raw escape hatch) ──────────────────────────────────────────
 
 def cmd_api(args):
@@ -643,6 +648,10 @@ def build_parser() -> argparse.ArgumentParser:
     p = wf_sub.add_parser("clear-tags", help="Remove all tags from a workflow")
     p.add_argument("id", help="Workflow ID")
     p.set_defaults(func=cmd_workflows_clear_tags)
+
+    p = wf_sub.add_parser("validate", help="Validate workflow JSON before import")
+    p.add_argument("file", help="JSON file path to validate")
+    p.set_defaults(func=cmd_workflows_validate)
 
     # ── executions ──
     ex = sub.add_parser("executions", aliases=["exec"], help="Execution operations")
