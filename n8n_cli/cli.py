@@ -275,6 +275,17 @@ def cmd_executions_stop(args):
     stop_execution(_client(args), args.id, as_json=_json(args))
 
 
+def cmd_executions_tail(args):
+    from .executions import tail_executions
+    tail_executions(
+        _client(args),
+        workflow_id=args.workflow_id,
+        status=args.status,
+        interval=args.interval,
+        as_json=_json(args),
+    )
+
+
 # ── Credentials ──────────────────────────────────────────────────────
 
 def cmd_credentials_list(args):
@@ -549,6 +560,77 @@ def cmd_workflows_validate(args):
     validate_workflow(args.file, as_json=_json(args))
 
 
+def cmd_workflows_diff(args):
+    """Compare a local workflow JSON against the live version on n8n."""
+    import difflib
+    client = _client(args)
+
+    # Get live workflow
+    live = client.get(f"/workflows/{args.id}")
+    live_json = json.dumps(live, indent=2, sort_keys=True).splitlines(keepends=True)
+
+    # Get local file
+    with open(args.file) as f:
+        local = json.load(f)
+    local_json = json.dumps(local, indent=2, sort_keys=True).splitlines(keepends=True)
+
+    diff = list(difflib.unified_diff(
+        live_json, local_json,
+        fromfile=f"live:{args.id}",
+        tofile=args.file,
+    ))
+
+    if _json(args):
+        print(json.dumps({
+            "has_changes": len(diff) > 0,
+            "additions": sum(1 for l in diff if l.startswith("+") and not l.startswith("+++")),
+            "deletions": sum(1 for l in diff if l.startswith("-") and not l.startswith("---")),
+            "diff": "".join(diff),
+        }, indent=2))
+    else:
+        if diff:
+            print(f"Differences between live:{args.id} and {args.file}:")
+            print()
+            for line in diff:
+                print(line, end="")
+        else:
+            print(f"No differences between live:{args.id} and {args.file}")
+
+
+def cmd_open(args):
+    """Open n8n web UI in the browser."""
+    import webbrowser
+    profile = get_profile(getattr(args, "profile", None))
+    api_url = profile.get("api_url", "")
+    if not api_url:
+        from .exceptions import N8nConfigError
+        raise N8nConfigError("No API URL configured.")
+
+    # Derive base URL
+    from .webhooks import _webhook_base_url
+    base = _webhook_base_url(api_url)
+
+    target = getattr(args, "target", None)
+    target_id = getattr(args, "target_id", None)
+
+    if target == "workflow" and target_id:
+        url = f"{base}/workflow/{target_id}"
+    elif target == "execution" and target_id:
+        url = f"{base}/executions/{target_id}"
+    elif target == "settings":
+        url = f"{base}/settings"
+    elif target == "credentials":
+        url = f"{base}/credentials"
+    else:
+        url = base
+
+    if _json(args):
+        print(json.dumps({"url": url}, indent=2))
+    else:
+        print(f"Opening: {url}")
+        webbrowser.open(url)
+
+
 # ── API (raw escape hatch) ──────────────────────────────────────────
 
 def cmd_api(args):
@@ -709,6 +791,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("file", help="JSON file path to validate")
     p.set_defaults(func=cmd_workflows_validate)
 
+    p = wf_sub.add_parser("diff", help="Compare local JSON against live workflow")
+    p.add_argument("id", help="Workflow ID to compare against")
+    p.add_argument("file", help="Local JSON file path")
+    p.set_defaults(func=cmd_workflows_diff)
+
     # ── executions ──
     ex = sub.add_parser("executions", aliases=["exec"], help="Execution operations")
     ex_sub = ex.add_subparsers(dest="exec_cmd")
@@ -734,6 +821,19 @@ def build_parser() -> argparse.ArgumentParser:
     p = ex_sub.add_parser("stop", help="Stop a running execution")
     p.add_argument("id", help="Execution ID")
     p.set_defaults(func=cmd_executions_stop)
+
+    p = ex_sub.add_parser("tail", help="Watch executions in real time")
+    p.add_argument("--workflow-id", help="Filter by workflow ID")
+    p.add_argument(
+        "--status",
+        choices=["error", "success", "waiting", "running", "new"],
+        help="Filter by status",
+    )
+    p.add_argument(
+        "--interval", type=float, default=3.0,
+        help="Poll interval in seconds (default: 3)",
+    )
+    p.set_defaults(func=cmd_executions_tail)
 
     # ── credentials ──
     cr = sub.add_parser("credentials", aliases=["creds"], help="Credential operations")
@@ -972,6 +1072,20 @@ def build_parser() -> argparse.ArgumentParser:
         help="Validate every bundled SKILL.md against the live CLI surface",
     )
     p.set_defaults(func=cmd_skills_doctor)
+
+    # ── open (browser) ──
+    op = sub.add_parser(
+        "open",
+        help="Open n8n web UI in the browser",
+        description="Open the n8n editor, a specific workflow, or settings in your browser.",
+    )
+    op.add_argument(
+        "target", nargs="?", default=None,
+        choices=["workflow", "execution", "settings", "credentials"],
+        help="What to open (default: editor home)",
+    )
+    op.add_argument("target_id", nargs="?", default=None, help="ID for workflow or execution")
+    op.set_defaults(func=cmd_open)
 
     # ── completion ──
     cp = sub.add_parser(
