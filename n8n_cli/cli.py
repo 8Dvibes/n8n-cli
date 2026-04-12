@@ -164,18 +164,52 @@ def cmd_workflows_update(args):
 
 
 def cmd_workflows_delete(args):
+    client = _client(args)
+    if getattr(args, "dry_run", False):
+        wf = client.get(f"/workflows/{args.id}")
+        if _json(args):
+            print(json.dumps({"dry_run": True, "action": "delete",
+                              "id": args.id, "name": wf.get("name"),
+                              "active": wf.get("active")}, indent=2))
+        else:
+            print(f"DRY RUN: Would delete workflow '{wf.get('name')}' ({args.id})")
+            if wf.get("active"):
+                print("  WARNING: This workflow is currently active.")
+        return
     from .workflows import delete_workflow
-    delete_workflow(_client(args), args.id, as_json=_json(args))
+    delete_workflow(client, args.id, as_json=_json(args))
 
 
 def cmd_workflows_activate(args):
+    client = _client(args)
+    if getattr(args, "dry_run", False):
+        wf = client.get(f"/workflows/{args.id}")
+        if _json(args):
+            print(json.dumps({"dry_run": True, "action": "activate",
+                              "id": args.id, "name": wf.get("name"),
+                              "active": wf.get("active")}, indent=2))
+        else:
+            status = "already active" if wf.get("active") else "currently inactive"
+            print(f"DRY RUN: Would activate '{wf.get('name')}' ({args.id}, {status})")
+        return
     from .workflows import activate_workflow
-    activate_workflow(_client(args), args.id, as_json=_json(args))
+    activate_workflow(client, args.id, as_json=_json(args))
 
 
 def cmd_workflows_deactivate(args):
+    client = _client(args)
+    if getattr(args, "dry_run", False):
+        wf = client.get(f"/workflows/{args.id}")
+        if _json(args):
+            print(json.dumps({"dry_run": True, "action": "deactivate",
+                              "id": args.id, "name": wf.get("name"),
+                              "active": wf.get("active")}, indent=2))
+        else:
+            status = "currently active" if wf.get("active") else "already inactive"
+            print(f"DRY RUN: Would deactivate '{wf.get('name')}' ({args.id}, {status})")
+        return
     from .workflows import deactivate_workflow
-    deactivate_workflow(_client(args), args.id, as_json=_json(args))
+    deactivate_workflow(client, args.id, as_json=_json(args))
 
 
 def cmd_workflows_export(args):
@@ -619,14 +653,20 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = wf_sub.add_parser("delete", aliases=["rm"], help="Delete a workflow")
     p.add_argument("id", help="Workflow ID")
+    p.add_argument("--dry-run", action="store_true",
+                   help="Show what would be deleted without doing it")
     p.set_defaults(func=cmd_workflows_delete)
 
     p = wf_sub.add_parser("activate", help="Activate a workflow")
     p.add_argument("id", help="Workflow ID")
+    p.add_argument("--dry-run", action="store_true",
+                   help="Show what would be activated without doing it")
     p.set_defaults(func=cmd_workflows_activate)
 
     p = wf_sub.add_parser("deactivate", help="Deactivate a workflow")
     p.add_argument("id", help="Workflow ID")
+    p.add_argument("--dry-run", action="store_true",
+                   help="Show what would be deactivated without doing it")
     p.set_defaults(func=cmd_workflows_deactivate)
 
     p = wf_sub.add_parser("export", help="Export workflow to JSON")
