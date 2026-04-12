@@ -26,7 +26,7 @@ Ask clarifying questions if the description is ambiguous:
 
 ```bash
 # Find the right nodes for each service mentioned
-n8n-cli nodes search <service-name>
+n8n-cli --json nodes search <service-name>
 
 # Get full property schema for each node you'll use
 n8n-cli --json nodes get <node-name> --full
@@ -73,7 +73,7 @@ n8n-cli workflows activate <returned-id>
 ### Step 5: Verify
 
 ```bash
-n8n-cli workflows get <id>
+n8n-cli --json workflows get <id>
 ```
 
 ## Output

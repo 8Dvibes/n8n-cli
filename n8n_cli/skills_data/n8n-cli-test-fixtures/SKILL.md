@@ -11,7 +11,7 @@ Read a webhook-triggered workflow, infer the input shape, and generate a set of 
 ## Procedure
 
 1. **Get the workflow**:
-   - `n8n-cli wf get <id>` (or by name)
+   - `n8n-cli --json wf get <id>` (or by name)
    - Confirm it has a webhook trigger node
    - Note the HTTP method, path, and any authentication
 

@@ -1,7 +1,6 @@
 """Workflow operations for n8n-cli."""
 
 import json
-import sys
 from typing import Optional
 
 from .client import N8nClient
@@ -44,6 +43,89 @@ def _sanitize_workflow_payload(data: dict) -> dict:
         if "executionOrder" not in cleaned["settings"]:
             cleaned["settings"]["executionOrder"] = "v1"
     return cleaned
+
+
+def validate_workflow(file_path: str, as_json: bool = False) -> None:
+    """Validate a workflow JSON file before import.
+
+    Checks required fields, unique node names, connection references,
+    and settings whitelist. Returns structured results in --json mode
+    so AI agents can parse validation errors and self-correct.
+    """
+    with open(file_path) as f:
+        data = json.load(f)
+
+    errors = []
+    warnings = []
+
+    # Required top-level fields
+    for field in ("name", "nodes", "connections"):
+        if field not in data:
+            errors.append(f"Missing required field: {field}")
+
+    # Node validation
+    if "nodes" in data:
+        names = set()
+        for i, node in enumerate(data["nodes"]):
+            if "type" not in node:
+                errors.append(f"Node {i}: missing 'type'")
+            if "name" not in node:
+                errors.append(f"Node {i}: missing 'name'")
+            elif node["name"] in names:
+                errors.append(
+                    f"Node {i}: duplicate name '{node['name']}'"
+                )
+            else:
+                names.add(node["name"])
+            if "position" not in node:
+                warnings.append(
+                    f"Node '{node.get('name', i)}': missing position"
+                )
+
+    # Connection references
+    if "connections" in data and "nodes" in data:
+        node_names = {n.get("name") for n in data["nodes"]}
+        for source in data["connections"]:
+            if source not in node_names:
+                errors.append(
+                    f"Connection from unknown node: '{source}'"
+                )
+
+    # Settings whitelist
+    if "settings" in data:
+        bad_keys = set(data["settings"].keys()) - _ALLOWED_SETTINGS
+        for key in sorted(bad_keys):
+            warnings.append(
+                f"Settings key '{key}' will be stripped on import"
+            )
+
+    # Read-only fields that will be stripped
+    for key in sorted(set(data.keys()) - _ALLOWED_TOP_LEVEL - {"name"}):
+        warnings.append(
+            f"Field '{key}' will be stripped on import (read-only)"
+        )
+
+    result = {
+        "valid": len(errors) == 0,
+        "errors": errors,
+        "warnings": warnings,
+        "node_count": len(data.get("nodes", [])),
+    }
+
+    if as_json:
+        print(json.dumps(result, indent=2))
+        return
+
+    if errors:
+        print(f"INVALID: {len(errors)} error(s)")
+        for e in errors:
+            print(f"  ERROR: {e}")
+    else:
+        name = data.get("name", "unnamed")
+        print(f"VALID: {name} ({result['node_count']} nodes)")
+
+    for w in warnings:
+        print(f"  WARN: {w}")
 
 
 def list_workflows(

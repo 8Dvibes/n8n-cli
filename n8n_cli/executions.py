@@ -1,6 +1,8 @@
 """Execution operations for n8n-cli."""
 
 import json
+import sys
+import time
 from typing import Optional
 
 from .client import N8nClient
@@ -162,6 +164,110 @@ def stop_execution(client: N8nClient, execution_id: str, as_json: bool = False) 
         return
 
     print(f"Stopped execution: {execution_id}")
+
+
+def tail_executions(
+    client: N8nClient,
+    workflow_id: Optional[str] = None,
+    status: Optional[str] = None,
+    interval: float = 3.0,
+    as_json: bool = False,
+) -> None:
+    """Watch executions in real time by polling the API.
+
+    Prints new executions as they appear, similar to `stripe logs tail`
+    or `wrangler tail`. Polls every `interval` seconds.
+
+    Press Ctrl+C to stop.
+    """
+    seen_ids: set = set()
+
+    # Seed with recent executions so we don't replay history
+    params = {}
+    if workflow_id:
+        params["workflowId"] = workflow_id
+    if status:
+        params["status"] = status
+
+    try:
+        initial = client.paginate("/executions", params=params, limit=10)
+        for ex in initial:
+            seen_ids.add(str(ex.get("id", "")))
+    except Exception:
+        pass  # If initial fetch fails, start fresh
+
+    if not as_json:
+        print("Watching executions... (Ctrl+C to stop)", file=sys.stderr)
+        if workflow_id:
+            print(f"  Filtering: workflow {workflow_id}", file=sys.stderr)
+        if status:
+            print(f"  Filtering: status {status}", file=sys.stderr)
+        print(file=sys.stderr)
+
+    try:
+        while True:
+            try:
+                recent = client.paginate(
+                    "/executions", params=params, limit=20
+                )
+            except Exception:
+                time.sleep(interval)
+                continue
+
+            new_execs = []
+            for ex in recent:
+                eid = str(ex.get("id", ""))
+                if eid and eid not in seen_ids:
+                    seen_ids.add(eid)
+                    new_execs.append(ex)
+
+            for ex in reversed(new_execs):  # Oldest first
+                if as_json:
+                    print(json.dumps({
+                        "id": ex.get("id"),
+                        "status": ex.get("status"),
+                        "mode": ex.get("mode"),
+                        "startedAt": ex.get("startedAt"),
+                        "stoppedAt": ex.get("stoppedAt"),
+                        "workflowId": ex.get("workflowId"),
+                        "workflowName": (
+                            ex.get("workflowData", {}).get("name")
+                            if isinstance(ex.get("workflowData"), dict)
+                            else ex.get("workflowName")
+                        ),
+                    }))
+                    sys.stdout.flush()
+                else:
+                    eid = str(ex.get("id", ""))
+                    st = ex.get("status", "?")
+                    started = (ex.get("startedAt") or "")[:19]
+                    wf_data = ex.get("workflowData") or {}
+                    wf_name = (
+                        wf_data.get("name", "")
+                        if isinstance(wf_data, dict)
+                        else str(wf_data)
+                    )[:30]
+
+                    # Color-code status
+                    marker = "+"
+                    if st == "error":
+                        marker = "X"
+                    elif st == "success":
+                        marker = "+"
+                    elif st in ("running", "waiting"):
+                        marker = "~"
+
+                    print(
+                        f"  {marker} [{started}] "
+                        f"{st:<10} {eid:<14} {wf_name}"
+                    )
+                    sys.stdout.flush()
+
+            time.sleep(interval)
+
+    except KeyboardInterrupt:
+        if not as_json:
+            print("\nStopped.", file=sys.stderr)
 
 
 def get_execution_tags(client: N8nClient, execution_id: str, as_json: bool = False) -> None:

@@ -52,7 +52,7 @@ For the specific workflow:
 Use the node catalog to find what credential types a node needs:
 
 ```bash
-n8n-cli nodes get <node-name>
+n8n-cli --json nodes get <node-name>
 ```
 
 The `credentials` field shows which credential types are required.
