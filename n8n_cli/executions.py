@@ -22,7 +22,7 @@ def list_executions(
     if status:
         params["status"] = status
 
-    if limit:
+    if limit is not None:
         execs = client.paginate("/executions", params=params, limit=limit)
     else:
         execs = client.paginate("/executions", params=params)
@@ -210,7 +210,11 @@ def tail_executions(
                 recent = client.paginate(
                     "/executions", params=params, limit=20
                 )
-            except Exception:
+            except Exception as poll_err:
+                print(
+                    f"  ! Poll failed: {poll_err} (retrying...)",
+                    file=sys.stderr,
+                )
                 time.sleep(interval)
                 continue
 

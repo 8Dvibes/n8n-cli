@@ -10,7 +10,7 @@ from .client import N8nClient
 from .exceptions import N8nConnectionError, N8nValidationError
 
 
-def _webhook_base_url(api_url: str) -> str:
+def webhook_base_url(api_url: str) -> str:
     """Derive the webhook base URL from the API URL.
 
     Strips the /api/v1 suffix to get the instance base URL, which is
@@ -62,7 +62,7 @@ def test_webhook(
         method = node_method
 
     # Build the webhook URL using the shared helper
-    base = _webhook_base_url(client.api_url)
+    base = webhook_base_url(client.api_url)
     webhook_url = f"{base}/webhook-test/{path}"
 
     # Parse the data payload
@@ -142,7 +142,7 @@ def list_webhooks(client: N8nClient, as_json: bool = False) -> None:
                 params = node.get("parameters", {})
                 path = params.get("path", "")
                 method = params.get("httpMethod", "POST")
-                base = _webhook_base_url(client.api_url)
+                base = webhook_base_url(client.api_url)
                 if path:
                     webhooks.append({
                         "workflow_id": wf.get("id"),

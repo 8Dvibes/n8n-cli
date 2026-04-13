@@ -9,7 +9,7 @@ from .exceptions import N8nValidationError
 
 def list_variables(client: N8nClient, limit: Optional[int] = None, as_json: bool = False) -> None:
     """List all variables."""
-    if limit:
+    if limit is not None:
         variables = client.paginate("/variables", limit=limit)
     else:
         variables = client.paginate("/variables")

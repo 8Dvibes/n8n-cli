@@ -100,7 +100,8 @@ def validate_workflow(file_path: str, as_json: bool = False) -> None:
             )
 
     # Read-only fields that will be stripped
-    for key in sorted(set(data.keys()) - _ALLOWED_TOP_LEVEL - {"name"}):
+    # _ALLOWED_TOP_LEVEL already includes "name"
+    for key in sorted(set(data.keys()) - _ALLOWED_TOP_LEVEL):
         warnings.append(
             f"Field '{key}' will be stripped on import (read-only)"
         )
@@ -148,7 +149,7 @@ def list_workflows(
     if project_id:
         params["projectId"] = project_id
 
-    if limit:
+    if limit is not None:
         workflows = client.paginate("/workflows", params=params, limit=limit)
     else:
         workflows = client.paginate("/workflows", params=params)

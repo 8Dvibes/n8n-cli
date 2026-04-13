@@ -1,30 +1,30 @@
 """Tests for webhook operations."""
 
-from n8n_cli.webhooks import _webhook_base_url
+from n8n_cli.webhooks import webhook_base_url
 
 
 class TestWebhookBaseUrl:
     def test_standard_api_v1(self):
-        assert _webhook_base_url("https://example.com/api/v1") == "https://example.com"
+        assert webhook_base_url("https://example.com/api/v1") == "https://example.com"
 
     def test_trailing_slash(self):
-        assert _webhook_base_url("https://example.com/api/v1/") == "https://example.com"
+        assert webhook_base_url("https://example.com/api/v1/") == "https://example.com"
 
     def test_nonstandard_api_path(self):
         url = "https://example.com/api/v2"
-        result = _webhook_base_url(url)
+        result = webhook_base_url(url)
         # Should find /api/ and strip from there
         assert result == "https://example.com"
 
     def test_no_api_in_path(self):
         url = "https://example.com/custom/path"
-        result = _webhook_base_url(url)
+        result = webhook_base_url(url)
         # No /api/ found, returns as-is
         assert result == url
 
     def test_cloud_url(self):
         url = "https://myinstance.app.n8n.cloud/api/v1"
-        assert _webhook_base_url(url) == "https://myinstance.app.n8n.cloud"
+        assert webhook_base_url(url) == "https://myinstance.app.n8n.cloud"
 
 
 class TestWebhookMethodFix:

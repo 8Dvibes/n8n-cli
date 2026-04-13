@@ -18,7 +18,7 @@ def list_credentials(
     if cred_type:
         params["type"] = cred_type
 
-    if limit:
+    if limit is not None:
         creds = client.paginate("/credentials", params=params, limit=limit)
     else:
         creds = client.paginate("/credentials", params=params)

@@ -607,8 +607,8 @@ def cmd_open(args):
         raise N8nConfigError("No API URL configured.")
 
     # Derive base URL
-    from .webhooks import _webhook_base_url
-    base = _webhook_base_url(api_url)
+    from .webhooks import webhook_base_url
+    base = webhook_base_url(api_url)
 
     target = getattr(args, "target", None)
     target_id = getattr(args, "target_id", None)
