@@ -225,6 +225,11 @@ def tail_executions(
                     seen_ids.add(eid)
                     new_execs.append(ex)
 
+            # Prevent unbounded growth on long sessions
+            if len(seen_ids) > 10000:
+                recent_ids = {str(e.get("id", "")) for e in recent}
+                seen_ids = recent_ids
+
             for ex in reversed(new_execs):  # Oldest first
                 if as_json:
                     print(json.dumps({

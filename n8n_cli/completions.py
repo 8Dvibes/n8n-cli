@@ -41,15 +41,17 @@ def _collect_commands(parser: argparse.ArgumentParser, prefix: str = "") -> dict
                         for opt in sub_action.option_strings:
                             if opt not in ("-h", "--help"):
                                 flags.append(opt)
+                    # Collect choices for flags that have them
+                    choices_map = {}
+                    for sa in sub._actions:
+                        if isinstance(sa, argparse._SubParsersAction):
+                            continue
+                        if sa.choices and sa.option_strings:
+                            for opt in sa.option_strings:
+                                choices_map[opt] = list(sa.choices)
                     result[path] = {
                         "flags": flags,
-                        "choices": {
-                            opt: list(sub_action.choices)
-                            for sub_action in sub._actions
-                            if sub_action.choices
-                            and not isinstance(sub_action, argparse._SubParsersAction)
-                            for opt in sub_action.option_strings
-                        },
+                        "choices": choices_map,
                     }
 
     return result
