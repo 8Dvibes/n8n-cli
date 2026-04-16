@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-cost
-description: "Execution cost and usage analysis for n8n. Find which workflows burn the most runs, hourly distribution, top spammers, and triggers that are firing way more often than expected. Use when investigating high usage, before billing reviews, or to optimize execution counts."
+description: "Analyze n8n execution costs and usage patterns. Finds top consumers, hourly distribution, and triggers firing too often. Use when investigating high usage, before billing reviews, or optimizing execution counts."
 user_invocable: true
 ---
 

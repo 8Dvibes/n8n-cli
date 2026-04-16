@@ -7,7 +7,7 @@
 
 **Scriptable, pipeable CLI for the n8n REST API. Zero external dependencies.**
 
-80+ commands. Auto-updating node catalog (543+ nodes). Multi-instance profiles. Works with n8n Cloud and self-hosted. Ships with 33 Claude Code skills.
+80+ commands. Auto-updating node catalog (543+ nodes). Multi-instance profiles. Works with n8n Cloud and self-hosted. Ships with 40 Claude Code skills.
 
 ![n8n-cli demo](demo.gif)
 
@@ -77,13 +77,13 @@ n8n-cli workflows import workflow.json --activate
 
 ## Claude Code Skills
 
-n8n-cli ships with **33 [Claude Code skills](https://docs.claude.com/claude-code)** -- pre-built slash commands that teach Claude Code how to drive n8n-cli for common workflows. Once installed, you can type `/n8n-cli-status`, `/n8n-cli-debug`, `/n8n-cli-create` etc. inside any Claude Code session and Claude will execute the right `n8n-cli` commands for you.
+n8n-cli ships with **40 [Claude Code skills](https://docs.claude.com/claude-code)** -- pre-built slash commands that teach Claude Code how to drive n8n-cli for common workflows. Once installed, you can type `/n8n-cli-status`, `/n8n-cli-debug`, `/n8n-cli-create` etc. inside any Claude Code session and Claude will execute the right `n8n-cli` commands for you.
 
 ```bash
 # See what's bundled and what's already installed
 n8n-cli skills list
 
-# Install all 33 into ~/.claude/skills/
+# Install all 40 into ~/.claude/skills/
 n8n-cli skills install
 
 # Install just one
@@ -165,6 +165,20 @@ After installing, restart Claude Code (or open a new session) and the slash comm
 | `/n8n-cli-from-cron` | Read a crontab and generate equivalent n8n workflows for each entry |
 | `/n8n-cli-from-launchd` | macOS-specific: read launchd plists and generate equivalent n8n workflows |
 | `/n8n-cli-from-zapier` | Migrate a Zapier zap to an equivalent n8n workflow |
+
+### Expert reference
+
+In-session reference libraries for n8n internals. No CLI commands -- Claude consults these as context when writing code or configuring nodes.
+
+| Skill | What it does |
+|---|---|
+| `/n8n-code-javascript` | JavaScript Code node syntax: `$input`/`$json`/`$node`, `$helpers`, DateTime, run-once vs run-for-each |
+| `/n8n-code-python` | Python Code node syntax (beta): `_input`/`_json`/`_node`, stdlib-only constraints |
+| `/n8n-expression-syntax` | Expression `{{ }}` syntax: `$json`, `$node`, `$vars`, common mistakes and fixes |
+| `/n8n-mcp-tools-expert` | Guide for using n8n-mcp MCP server tools: tool selection, parameter formatting, validation |
+| `/n8n-node-configuration` | Operation-aware node property guidance: required fields, property dependencies, common patterns |
+| `/n8n-validation-expert` | Fix workflow validation errors: error codes, false positives, credential vs config issues |
+| `/n8n-workflow-patterns` | Proven architecture patterns: webhooks, HTTP API integration, AI agents, scheduled tasks, database ops |
 
 The skills install to `~/.claude/skills/` by default. Override with `CLAUDE_SKILLS_DIR=/some/path n8n-cli skills install`.
 

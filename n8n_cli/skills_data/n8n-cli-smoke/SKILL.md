@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-smoke
-description: "Define a smoke-test suite for n8n workflows and run it on demand or after every deploy. Hits webhook endpoints with known-good payloads and verifies expected responses. Use when promoting workflows from staging to prod, after major changes, or as a daily reliability check."
+description: "Run smoke tests against n8n webhook workflows. Sends known-good payloads and verifies expected responses. Use when promoting to production, after major changes, or as a daily reliability check."
 user_invocable: true
 ---
 

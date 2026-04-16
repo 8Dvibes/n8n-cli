@@ -1,6 +1,6 @@
 ---
 name: n8n-creds
-description: "Credential management and gap analysis for n8n. Lists available credentials, finds what workflows need, identifies gaps. Use when auditing credentials, setting up new workflows, or troubleshooting auth issues."
+description: "Audit n8n credentials and find gaps. Lists what exists, what workflows need, and what is missing. Use when auditing credentials, setting up new workflows, or troubleshooting auth failures."
 user_invocable: true
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-from-zapier
-description: "Migrate a Zapier zap to an equivalent n8n workflow. Reads a zap export (JSON or screenshot description) and generates the n8n workflow JSON. Use when moving off Zapier to n8n for cost, ownership, or flexibility reasons."
+description: "Migrate a Zapier zap to an equivalent n8n workflow. Reads zap exports or descriptions and generates n8n JSON. Use when moving off Zapier for cost, ownership, or flexibility."
 user_invocable: true
 ---
 

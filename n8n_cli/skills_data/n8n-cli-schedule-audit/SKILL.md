@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-schedule-audit
-description: "Audit every Schedule Trigger across all workflows. Find cron collisions (50 things firing at 3am), suggest a rebalanced schedule, and flag wrong-looking expressions. Use before going to production, after major imports, or when trying to spread load."
+description: "Audit n8n Schedule Triggers for cron collisions and bad expressions. Finds 50-things-at-3am pileups and suggests rebalanced schedules. Use before going to production, after imports, or when spreading load."
 user_invocable: true
 ---
 

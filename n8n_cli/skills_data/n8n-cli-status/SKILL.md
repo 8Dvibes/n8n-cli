@@ -1,6 +1,6 @@
 ---
 name: n8n-status
-description: "Health check + execution stats + active workflow summary for n8n instances. Use when checking n8n health, reviewing workflow status, or getting an overview of the n8n instance."
+description: "Check n8n instance health, active workflows, and recent execution stats. Quick overview in one command. Use when checking if n8n is up, reviewing status, or getting an instance summary."
 user_invocable: true
 ---
 

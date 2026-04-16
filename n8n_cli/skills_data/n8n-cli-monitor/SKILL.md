@@ -1,6 +1,6 @@
 ---
 name: n8n-monitor
-description: "Watch n8n execution stream and alert on failures. Use when monitoring n8n workflows, watching for errors, or setting up failure alerts."
+description: "Poll n8n execution stream from the terminal and surface failures. Runs outside n8n as a CLI watcher. NOT a workflow -- use /n8n-cli-meta-monitor to build an in-n8n alerting workflow. Use when watching for errors live."
 user_invocable: true
 ---
 

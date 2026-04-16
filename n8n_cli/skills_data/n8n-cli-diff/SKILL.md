@@ -1,6 +1,6 @@
 ---
 name: n8n-diff
-description: "Compare n8n workflows between instances, between local JSON and live, or between two versions. Use when checking for drift, reviewing changes, or auditing workflow differences."
+description: "Diff n8n workflow versions side-by-side. Shows structural changes between instances, local files, or backups. NOT a review -- use /n8n-cli-review for risk analysis. Use when checking for drift or auditing what changed."
 user_invocable: true
 ---
 

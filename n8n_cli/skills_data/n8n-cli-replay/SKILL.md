@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-replay
-description: "Pull a real failed n8n execution, capture its input, and replay it locally so you can debug without waiting for the trigger to fire again. Use when investigating intermittent failures or building a regression test from a real bug."
+description: "Replay a specific failed n8n execution with its original input data. Reproduces the failure on demand without waiting for the trigger. NOT pattern analysis -- use /n8n-debug for that. Use when reproducing an intermittent bug."
 user_invocable: true
 ---
 

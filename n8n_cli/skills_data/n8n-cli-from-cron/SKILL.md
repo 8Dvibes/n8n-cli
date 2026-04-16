@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-from-cron
-description: "Read a crontab (or list of cron jobs) and generate equivalent n8n workflows for each entry. Use when migrating off bare cron + scripts onto n8n for better visibility, error handling, and observability."
+description: "Convert crontab entries into equivalent n8n workflows. Reads cron jobs and generates one workflow per entry. Use when migrating off bare cron onto n8n for visibility and error handling."
 user_invocable: true
 ---
 

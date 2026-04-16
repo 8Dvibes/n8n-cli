@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-refactor
-description: "Analyze an n8n workflow for simplification opportunities and propose a refactored version. Looks for redundant nodes, opportunities to use Switch/Merge instead of branching, repeated HTTP calls that could batch, and over-complex Code nodes. Use when a workflow has 20+ nodes and feels unwieldy."
+description: "Refactor an n8n workflow for simplification. Finds redundant nodes, batching opportunities, and over-complex Code nodes, then proposes a cleaner version. Use when a workflow feels unwieldy or has grown past 20 nodes."
 user_invocable: true
 ---
 

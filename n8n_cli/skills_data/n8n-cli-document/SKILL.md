@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-document
-description: "Read an n8n workflow JSON and write human-readable docs: what it does, trigger, steps, credentials used, failure modes. Outputs markdown ready to share. Use when documenting workflows for team handoff, audits, or onboarding."
+description: "Generate human-readable markdown docs from an n8n workflow JSON. Covers trigger, steps, credentials, and failure modes. Use when documenting workflows for team handoff, audits, or onboarding."
 user_invocable: true
 ---
 

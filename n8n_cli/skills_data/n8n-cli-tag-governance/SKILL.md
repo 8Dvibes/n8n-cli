@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-tag-governance
-description: "Find untagged workflows, propose a tag taxonomy based on workflow content, and bulk-apply tags. Use when an n8n instance has grown organically and tagging is inconsistent or missing."
+description: "Design and enforce a tag taxonomy for n8n workflows. Finds untagged workflows, proposes tags based on content, and applies them. NOT deletion -- use /n8n-cli-cleanup for junk removal. Use when tagging is inconsistent or missing."
 user_invocable: true
 ---
 

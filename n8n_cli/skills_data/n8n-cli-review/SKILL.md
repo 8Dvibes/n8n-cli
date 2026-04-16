@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-review
-description: "PR-style code review of workflow changes. Compare two workflow JSON versions and produce a structured review with explanations of what changed, why it matters, and risk level. Use when reviewing changes before merging to production, after a colleague hands off a workflow, or when investigating drift between environments."
+description: "Review n8n workflow changes PR-style with risk ratings. Explains what changed, why it matters, and flags dangers. NOT a raw diff -- use /n8n-diff for that. Use when approving changes before production or after a handoff."
 user_invocable: true
 ---
 

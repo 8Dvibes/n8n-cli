@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-cleanup
-description: "Find dead workflows, orphaned credentials, untagged junk, and duplicate webhooks. Outputs a triage list with safe-to-delete recommendations. Use when an n8n instance has gotten messy, before audits, or as routine quarterly hygiene."
+description: "Find dead workflows, orphaned credentials, and duplicate webhooks for deletion. Outputs safe-to-delete recommendations. NOT tagging -- use /n8n-cli-tag-governance for that. Use for quarterly hygiene sweeps."
 user_invocable: true
 ---
 

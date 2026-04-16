@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-template
-description: "Convert an existing n8n workflow into a reusable template (strip IDs, credentials, env-specific values) or instantiate a new workflow from a template by filling in placeholders. Use for productizing workflows, sharing patterns across instances, or building a workflow library."
+description: "Templatize or instantiate n8n workflows. Strips IDs and credentials to create reusable templates, or fills placeholders to create new workflows from templates. Use for sharing patterns across instances or building a library."
 user_invocable: true
 ---
 

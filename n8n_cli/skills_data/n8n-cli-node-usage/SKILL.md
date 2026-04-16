@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-node-usage
-description: "Search across all workflows for usage of a specific node type, credential, or pattern. Answers 'which workflows use the Slack node?' or 'which workflows use the OpenAI API?'. Use when an API is changing, a node version has a breaking change, or you need to update everything that uses a specific service."
+description: "Search all n8n workflows for a specific node type, credential, or pattern. Answers 'which workflows use Slack?' Use when an API changes, a node has a breaking update, or you need to find every use of a service."
 user_invocable: true
 ---
 

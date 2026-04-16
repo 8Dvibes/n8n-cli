@@ -1,6 +1,6 @@
 ---
 name: n8n-create
-description: "Describe a workflow in English, Claude builds the JSON, and imports it to n8n via n8n-cli. Use when building new n8n workflows from a description."
+description: "Build an n8n workflow from an English description. Generates valid JSON and imports it via n8n-cli. Use when creating a new workflow from scratch based on a natural-language spec."
 user_invocable: true
 ---
 

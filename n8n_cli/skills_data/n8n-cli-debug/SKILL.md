@@ -1,6 +1,6 @@
 ---
 name: n8n-debug
-description: "Pull failed n8n executions, analyze error patterns, and suggest fixes. Use when debugging n8n workflow failures, investigating execution errors, or troubleshooting workflow issues."
+description: "Analyze failed n8n executions and suggest fixes. Pulls error logs, groups by pattern, and diagnoses root causes. NOT replay -- use /n8n-cli-replay to re-run a specific failure. Use when debugging workflow errors."
 user_invocable: true
 ---
 

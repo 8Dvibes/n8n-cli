@@ -40,7 +40,7 @@ n8n_cli/
 
 ## Claude Code skills
 
-`n8n_cli/skills_data/` is the canonical home for the 32 Claude Code skills that ship with the tool, organized into 7 categories:
+`n8n_cli/skills_data/` is the canonical home for the 40 Claude Code skills that ship with the tool, organized into 8 categories:
 
 - **Core ops** (11): status, debug, create, import, export, monitor, migrate, backup, diff, webhook-test, creds
 - **Hygiene** (4): cleanup, cost, schedule-audit, tag-governance
@@ -49,6 +49,7 @@ n8n_cli/
 - **Production ops** (3): meta-monitor, upgrade-preflight, bulk
 - **Testing** (3): test-fixtures, replay, smoke
 - **Bridge to other tools** (5): from-mcp, to-mcp, from-cron, from-launchd, from-zapier
+- **Expert reference** (7): code-javascript, code-python, expression-syntax, mcp-tools-expert, node-configuration, validation-expert, workflow-patterns
 
 Each subdirectory is a skill (e.g. `n8n-cli-status/SKILL.md`). The `skills.py` module reads them via `importlib.resources.files("n8n_cli.skills_data")` so it works from editable installs, wheels, and sdists alike.
 

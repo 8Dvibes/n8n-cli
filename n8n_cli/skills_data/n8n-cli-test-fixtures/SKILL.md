@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-test-fixtures
-description: "Generate realistic test payloads for an n8n webhook workflow based on its input schema and the kinds of data it expects. Saves fixtures to a tests directory you can replay later. Use when adding tests for an existing workflow or building one TDD-style."
+description: "Generate realistic test payloads for n8n webhook workflows. Infers input schema and creates happy-path, edge-case, and error fixtures. Use when adding tests to an existing workflow or building one TDD-style."
 user_invocable: true
 ---
 

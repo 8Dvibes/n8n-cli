@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-from-mcp
-description: "Convert an MCP server (or Claude Code skill) into the equivalent n8n workflow. Useful when you want to move agent capabilities from Claude into n8n so they run on a schedule or via webhook without an agent in the loop. Use when productizing an MCP-driven prototype."
+description: "Convert an MCP server or Claude Code skill into an n8n workflow. Moves agent capabilities into n8n to run on a schedule or webhook without an agent. Use when productizing an MCP-driven prototype."
 user_invocable: true
 ---
 

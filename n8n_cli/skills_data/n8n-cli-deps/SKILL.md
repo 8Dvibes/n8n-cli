@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-deps
-description: "Build a dependency graph for n8n: workflow → sub-workflow calls, workflow → credential refs, workflow → webhook URLs. Outputs as a tree, mermaid diagram, or JSON. Use when you need to understand how workflows are interconnected before making changes."
+description: "Map n8n workflow dependencies as a graph. Shows sub-workflow calls, credential refs, and webhook URLs as tree, mermaid, or JSON. Use when understanding interconnections before making changes."
 user_invocable: true
 ---
 

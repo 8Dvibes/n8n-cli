@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-bulk
-description: "Safely run bulk operations across n8n workflows: activate by tag, deactivate by criteria, archive everything not run in 90 days, transfer workflows between projects, set tags in batch. Always shows a dry-run plan first. Use for housekeeping, project reorgs, or environment migrations."
+description: "Run bulk activate/deactivate/archive/transfer operations across n8n workflows with mandatory dry-run first. Operates on existing tags -- NOT tag design (use /n8n-cli-tag-governance). Use for batch state changes and project reorgs."
 user_invocable: true
 ---
 

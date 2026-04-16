@@ -1,6 +1,6 @@
 ---
 name: n8n-webhook-test
-description: "Send test payloads to n8n webhook workflows from the terminal. Use when testing webhooks, debugging webhook integrations, or verifying workflow triggers."
+description: "Fire test requests at n8n webhook endpoints from the terminal. Sends custom or empty payloads and shows the response. Use when testing webhooks, debugging integrations, or verifying triggers."
 user_invocable: true
 ---
 

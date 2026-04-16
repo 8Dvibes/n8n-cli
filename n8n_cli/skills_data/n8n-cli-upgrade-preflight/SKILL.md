@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-upgrade-preflight
-description: "Pre-flight check before upgrading an n8n instance. Scans for deprecated nodes, breaking-change risks, community packages that might not survive the upgrade, and outputs a 'safe to upgrade?' report. Use before any major n8n version bump."
+description: "Pre-flight safety check before upgrading n8n. Scans for deprecated nodes, breaking changes, and at-risk community packages. Outputs a go/no-go report. Use before any major n8n version bump."
 user_invocable: true
 ---
 

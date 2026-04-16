@@ -1,6 +1,6 @@
 ---
 name: n8n-migrate
-description: "Migrate n8n workflows between instances (cloud <-> self-hosted). Exports, remaps credentials, and imports. Use when moving workflows between n8n instances."
+description: "Migrate n8n workflows between instances (cloud to self-hosted or vice versa). Exports, remaps credentials, and imports in one pass. Use when moving workflows across n8n environments."
 user_invocable: true
 ---
 

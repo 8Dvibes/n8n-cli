@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-from-launchd
-description: "Read macOS launchd plists (~/Library/LaunchAgents and /Library/LaunchDaemons) and generate equivalent n8n workflows for each scheduled job. Use when migrating off launchd-managed scripts onto n8n for visibility, error handling, and observability. macOS-specific sibling to /n8n-cli-from-cron."
+description: "Convert macOS launchd plists into equivalent n8n workflows. Reads LaunchAgents and LaunchDaemons. macOS sibling to /n8n-cli-from-cron. Use when migrating off launchd onto n8n for observability."
 user_invocable: true
 ---
 

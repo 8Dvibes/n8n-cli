@@ -1,6 +1,6 @@
 ---
 name: n8n-export
-description: "Export n8n workflows to JSON for version control, backup, or migration. Use when backing up workflows, exporting for git, or migrating between instances."
+description: "Export individual n8n workflows to JSON files. Selective, single-workflow exports for git or sharing. NOT a full instance backup -- use /n8n-backup for that. Use when saving one workflow to a file."
 user_invocable: true
 ---
 

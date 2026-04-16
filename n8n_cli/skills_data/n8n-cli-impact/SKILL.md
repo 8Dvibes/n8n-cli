@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-impact
-description: "Reverse-lookup the blast radius of a change before you make it. 'If I delete credential X, rotate API key Y, change workflow Z, deactivate webhook W — what breaks?' Use before any destructive change in production."
+description: "Check blast radius before making n8n changes. Answers 'if I delete credential X or deactivate workflow Y, what breaks?' Use before any destructive operation in production."
 user_invocable: true
 ---
 

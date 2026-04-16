@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "n8n-toolkit"
-version = "0.4.1"
+version = "0.4.2"
 description = "CLI tool for the n8n REST API — scriptable, pipeable, zero dependencies"
 readme = "README.md"
 license = {text = "MIT"}

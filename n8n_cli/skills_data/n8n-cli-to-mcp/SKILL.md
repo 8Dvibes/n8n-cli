@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-to-mcp
-description: "Wrap an n8n workflow as a callable tool that AI agents (Claude, Cursor, Codex) can invoke. Generates an MCP-compatible tool definition or a simple HTTP tool spec. Use when you want to expose an n8n workflow to an agent as a callable function."
+description: "Expose an n8n workflow as an MCP tool for AI agents. Generates a tool definition that Claude, Cursor, or Codex can call. Inverse of /n8n-cli-from-mcp. Use when agents need to invoke an n8n workflow on demand."
 user_invocable: true
 ---
 

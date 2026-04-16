@@ -1,6 +1,6 @@
 ---
 name: n8n-backup
-description: "Full n8n instance backup to a git-tracked directory. Exports all workflows, credentials list, tags, and variables. Use when backing up n8n, creating snapshots, or setting up version control for workflows."
+description: "Back up an entire n8n instance to a git-tracked directory. Exports all workflows, credentials, tags, and variables as a snapshot. NOT single-file export -- use /n8n-export for that. Use when creating full instance snapshots."
 user_invocable: true
 ---
 
