@@ -1,7 +1,6 @@
 """Workflow operations for n8n-cli."""
 
 import json
-import sys
 from typing import Optional
 
 from .client import N8nClient
