@@ -17,7 +17,7 @@ Pull execution counts grouped by workflow and surface the top consumers, suspici
 
 2. **Group by workflow**:
    - For each unique workflow ID in the result set, count: total runs, success count, error count, average frequency (runs per hour).
-   - Cross-reference with `n8n-cli workflows list` to get the workflow name.
+   - Cross-reference with `n8n-cli --json workflows list` to get the workflow name.
 
 3. **Top consumers table**:
    - Top 10 workflows by execution count
@@ -33,7 +33,7 @@ Pull execution counts grouped by workflow and surface the top consumers, suspici
    - More than 10 times per minute in any 1-min bucket
    - With 50%+ error rate (failing fast = wasted execution count)
 
-6. **Schedule trigger sanity check** — for each workflow with a Schedule Trigger, fetch the workflow JSON (`n8n-cli wf get <id>`), inspect the cron expression, and flag:
+6. **Schedule trigger sanity check** — for each workflow with a Schedule Trigger, fetch the workflow JSON (`n8n-cli --json wf get <id>`), inspect the cron expression, and flag:
    - `* * * * *` (every minute) workflows
    - `*/5 * * * *` or tighter (every 5 min or less) without explicit user intent
    - Cron expressions you can't parse — flag for manual review
