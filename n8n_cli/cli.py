@@ -25,7 +25,7 @@ def cmd_health(args):
     client = _client(args)
     try:
         # Try listing workflows with limit=1 as a health check
-        resp = client.get("/workflows", params={"limit": 1})
+        client.get("/workflows", params={"limit": 1})
         profile = get_profile(getattr(args, "profile", None))
         if _json(args):
             print(json.dumps({
