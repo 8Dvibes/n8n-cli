@@ -8,7 +8,7 @@ from .client import N8nClient
 
 def list_tags(client: N8nClient, limit: Optional[int] = None, as_json: bool = False) -> None:
     """List all tags."""
-    if limit:
+    if limit is not None:
         tags = client.paginate("/tags", limit=limit)
     else:
         tags = client.paginate("/tags")

@@ -1,10 +1,10 @@
 """Credential operations for n8n-cli."""
 
 import json
-import sys
 from typing import Optional
 
 from .client import N8nClient
+from .exceptions import N8nValidationError
 
 
 def list_credentials(
@@ -18,7 +18,7 @@ def list_credentials(
     if cred_type:
         params["type"] = cred_type
 
-    if limit:
+    if limit is not None:
         creds = client.paginate("/credentials", params=params, limit=limit)
     else:
         creds = client.paginate("/credentials", params=params)
@@ -61,8 +61,7 @@ def get_credential(client: N8nClient, credential_id: str, as_json: bool = False)
                     cred = c
                     break
             if not cred:
-                print(f"Credential '{credential_id}' not found.", file=sys.stderr)
-                sys.exit(1)
+                raise N8nValidationError(f"Credential '{credential_id}' not found.")
         else:
             raise
 
