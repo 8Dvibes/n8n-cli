@@ -11,7 +11,7 @@ Take an n8n workflow (typically webhook-triggered) and produce a tool definition
 ## Procedure
 
 1. **Get the workflow**:
-   - `n8n-cli wf get <id>`
+   - `n8n-cli --json wf get <id>`
    - Confirm it's webhook-triggered (other trigger types can't be called by an agent on demand)
 
 2. **Infer the tool's interface**:
@@ -96,7 +96,7 @@ Take an n8n workflow (typically webhook-triggered) and produce a tool definition
 
 User says: "I built an n8n workflow that takes a customer ID and returns their LTV. Wrap it as a tool I can call from Claude Code."
 
-1. Find the workflow → `n8n-cli wf list --name "LTV"`
+1. Find the workflow → `n8n-cli --json wf list --name "LTV"`
 2. Get its webhook URL → check the trigger node config
 3. Inspect input/output → walk nodes
 4. Generate MCP tool spec

@@ -11,8 +11,8 @@ Take a specific execution (usually a failure) and reproduce it on demand without
 ## Procedure
 
 1. **Get the target execution**:
-   - If user gives an execution ID: `n8n-cli exec get <id>` to fetch the full execution data
-   - If user says "the last failed run of workflow X": `n8n-cli exec list --workflow-id <id> --status error --limit 1` then fetch the first result
+   - If user gives an execution ID: `n8n-cli --json exec get <id>` to fetch the full execution data
+   - If user says "the last failed run of workflow X": `n8n-cli --json exec list --workflow-id <id> --status error --limit 1` then fetch the first result
 
 2. **Extract the input data**:
    - Look at the execution's `data.startData` or equivalent — this is what the trigger received
