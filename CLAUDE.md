@@ -114,3 +114,13 @@ This makes round-trips work transparently: `wf export <id> -o file.json && wf im
 - **`wf set-tags` requires at least one tag ID.** It cannot clear all tags. Use `wf clear-tags <id>` (added in v0.4.1) to remove all tags from a workflow.
 - **`wf set-tags` REPLACES, not appends.** To add a tag, fetch existing tags first, combine, then set the combined list.
 - **`packages list` returns HTTP 404** on n8n's REST API on both cloud and self-hosted. The community-packages endpoint is not part of the public API. Skills that need this info (e.g. `/n8n-cli-upgrade-preflight`) prompt the user manually.
+
+<!-- OPENWIKI:START -->
+
+## OpenWiki
+
+This repository uses OpenWiki for recurring code documentation. Start with `openwiki/quickstart.md`, then follow its links to architecture, workflows, domain concepts, operations, integrations, testing guidance, and source maps.
+
+The scheduled OpenWiki GitHub Actions workflow refreshes the repository wiki. Do not hand-edit generated OpenWiki pages unless explicitly asked; prefer updating source code/docs and letting OpenWiki regenerate.
+
+<!-- OPENWIKI:END -->
