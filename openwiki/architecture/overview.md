@@ -73,4 +73,4 @@ This makes round-trips work transparently: `wf export <id> -o file.json && wf im
 
 ## OpenWiki Integration
 
-A scheduled GitHub Actions workflow (`.github/workflows/openwiki-update.yml`) runs daily at 08:00 UTC, executing `openwiki code --update --print` to regenerate this documentation. Changes are committed via a pull request to the `openwiki/update` branch.
+OpenWiki regenerates this documentation on demand via `openwiki code --update --print` through a reviewed, gated pipeline. There is no GitHub Actions workflow in this repo — the CLI's self-installed `.github/workflows/openwiki-update.yml` is stripped before commit under our Actions-free policy; changes land through a reviewed PR.
