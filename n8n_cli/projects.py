@@ -8,7 +8,7 @@ from .client import N8nClient
 
 def list_projects(client: N8nClient, limit: Optional[int] = None, as_json: bool = False) -> None:
     """List all projects."""
-    if limit:
+    if limit is not None:
         projects = client.paginate("/projects", limit=limit)
     else:
         projects = client.paginate("/projects")

@@ -8,7 +8,7 @@ from .client import N8nClient
 
 def list_users(client: N8nClient, limit: Optional[int] = None, as_json: bool = False) -> None:
     """List all users."""
-    if limit:
+    if limit is not None:
         users = client.paginate("/users", limit=limit)
     else:
         users = client.paginate("/users")

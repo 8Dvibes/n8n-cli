@@ -1,10 +1,27 @@
 """Webhook operations for n8n-cli."""
 
 import json
-import sys
+import ssl
+import urllib.error
+import urllib.request
 from typing import Optional
 
 from .client import N8nClient
+from .exceptions import N8nConnectionError, N8nValidationError
+
+
+def webhook_base_url(api_url: str) -> str:
+    """Derive the webhook base URL from the API URL.
+
+    Strips the /api/v1 suffix to get the instance base URL, which is
+    used to construct webhook and webhook-test URLs.
+    """
+    if api_url.endswith("/api/v1"):
+        return api_url[:-7]
+    elif api_url.endswith("/api/v1/"):
+        return api_url[:-8]
+    idx = api_url.find("/api/")
+    return api_url[:idx] if idx != -1 else api_url
 
 
 def test_webhook(
@@ -30,8 +47,7 @@ def test_webhook(
             break
 
     if not webhook_node:
-        print(f"No webhook node found in workflow {workflow_id}.", file=sys.stderr)
-        sys.exit(1)
+        raise N8nValidationError(f"No webhook node found in workflow {workflow_id}.")
 
     # Extract webhook path from node parameters
     params = webhook_node.get("parameters", {})
@@ -39,24 +55,14 @@ def test_webhook(
     node_method = params.get("httpMethod", "POST")
 
     if not path:
-        print(f"Webhook node found but no path configured.", file=sys.stderr)
-        sys.exit(1)
+        raise N8nValidationError("Webhook node found but no path configured.")
 
     # Use the node's configured method unless user explicitly overrides
     if method == "POST" and node_method != "POST":
         method = node_method
 
-    # Build the webhook URL structurally (don't use string replace)
-    api_url = client.api_url
-    # Strip /api/v1 from end to get base URL
-    if api_url.endswith("/api/v1"):
-        base = api_url[:-7]
-    elif api_url.endswith("/api/v1/"):
-        base = api_url[:-8]
-    else:
-        # Fallback: try to find /api/ and strip from there
-        idx = api_url.find("/api/")
-        base = api_url[:idx] if idx != -1 else api_url
+    # Build the webhook URL using the shared helper
+    base = webhook_base_url(client.api_url)
     webhook_url = f"{base}/webhook-test/{path}"
 
     # Parse the data payload
@@ -64,27 +70,23 @@ def test_webhook(
     if data:
         try:
             payload = json.loads(data)
-        except json.JSONDecodeError:
-            print(f"Invalid JSON data: {data}", file=sys.stderr)
-            sys.exit(1)
+        except json.JSONDecodeError as e:
+            raise N8nValidationError(f"Invalid JSON data: {data}") from e
 
     if not as_json:
         print(f"Workflow:  {wf.get('name')} ({workflow_id})")
         print(f"Webhook:   {webhook_node.get('name')}")
         print(f"Path:      {path}")
-        print(f"Method:    {http_method}")
+        print(f"Method:    {method}")
         print(f"URL:       {webhook_url}")
         print(f"Sending test request...")
         print()
 
     # Send the webhook request
-    import urllib.error
-    import urllib.request as urlreq
-
     req_data = json.dumps(payload).encode("utf-8") if payload else None
     headers = {"Content-Type": "application/json"} if payload else {}
 
-    req = urlreq.Request(
+    req = urllib.request.Request(
         webhook_url,
         data=req_data,
         headers=headers,
@@ -92,9 +94,8 @@ def test_webhook(
     )
 
     try:
-        import ssl
         ctx = ssl.create_default_context()
-        with urlreq.urlopen(req, context=ctx, timeout=30) as resp:
+        with urllib.request.urlopen(req, context=ctx, timeout=30) as resp:
             body = resp.read().decode("utf-8")
             status = resp.status
 
@@ -119,12 +120,13 @@ def test_webhook(
         else:
             print(f"Status: {e.code}")
             print(f"Error: {body}")
-        sys.exit(1)
+        raise N8nConnectionError(f"Webhook request failed with HTTP {e.code}") from e
     except urllib.error.URLError as e:
-        print(f"Connection error: {e.reason}", file=sys.stderr)
-        print(f"Note: The workflow must be active for production webhooks,", file=sys.stderr)
-        print(f"or have 'Listen for test event' running for test webhooks.", file=sys.stderr)
-        sys.exit(1)
+        raise N8nConnectionError(
+            f"{e.reason}. "
+            "The workflow must be active for production webhooks, "
+            "or have 'Listen for test event' running for test webhooks."
+        ) from e
 
 
 def list_webhooks(client: N8nClient, as_json: bool = False) -> None:
@@ -140,14 +142,7 @@ def list_webhooks(client: N8nClient, as_json: bool = False) -> None:
                 params = node.get("parameters", {})
                 path = params.get("path", "")
                 method = params.get("httpMethod", "POST")
-                api_url = client.api_url
-                if api_url.endswith("/api/v1"):
-                    base = api_url[:-7]
-                elif api_url.endswith("/api/v1/"):
-                    base = api_url[:-8]
-                else:
-                    idx = api_url.find("/api/")
-                    base = api_url[:idx] if idx != -1 else api_url
+                base = webhook_base_url(client.api_url)
                 if path:
                     webhooks.append({
                         "workflow_id": wf.get("id"),

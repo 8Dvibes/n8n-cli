@@ -11,9 +11,9 @@ Take an n8n workflow and produce markdown documentation a human can read without
 ## Procedure
 
 1. **Get the workflow JSON**:
-   - If the user gives a workflow ID: `n8n-cli wf get <id>` (or `wf export <id> -o /tmp/wf.json`)
+   - If the user gives a workflow ID: `n8n-cli --json wf get <id>` (or `wf export <id> -o /tmp/wf.json`)
    - If the user gives a file path: read it directly
-   - If the user gives a name: `n8n-cli wf list --name "..."` to find the ID first
+   - If the user gives a name: `n8n-cli --json wf list --name "..."` to find the ID first
 
 2. **Parse the structure**:
    - Trigger: find the start node(s). Note type (webhook, schedule, manual, etc.) and config (URL path, cron, etc.)
@@ -98,4 +98,4 @@ By default, print the markdown to stdout. If the user says "save it", write to:
 
 ## Companion: bulk documentation
 
-If the user asks "document all workflows in project X", iterate `n8n-cli wf list --project-id X`, generate one markdown file per workflow, and offer to commit them to a docs repo.
+If the user asks "document all workflows in project X", iterate `n8n-cli --json wf list --project-id X`, generate one markdown file per workflow, and offer to commit them to a docs repo.
