@@ -28,6 +28,9 @@ classifiers = [
     "Topic :: System :: Systems Administration",
 ]
 
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
 [project.scripts]
 n8n-cli = "n8n_cli.cli:main"
 

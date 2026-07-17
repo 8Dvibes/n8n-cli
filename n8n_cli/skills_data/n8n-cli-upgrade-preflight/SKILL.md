@@ -12,7 +12,7 @@ Scan an n8n instance against a target version and produce a report of what's lik
 
 1. **Identify current and target versions**:
    - Ask the user: "What version are you on, and what version are you upgrading to?"
-   - If unsure of current version, hint at checking the n8n UI footer or running `n8n-cli health` (which sometimes returns version info)
+   - If unsure of current version, hint at checking the n8n UI footer or running `n8n-cli --json health` (which sometimes returns version info)
 
 2. **Pull n8n changelog for the version range**:
    - Recommend the user open https://github.com/n8n-io/n8n/releases for the official changelog
@@ -23,7 +23,7 @@ Scan an n8n instance against a target version and produce a report of what's lik
    - For each workflow, fetch the full JSON
    - Extract every node `type` and `typeVersion` used across all workflows
    - `n8n-cli --json credentials list` → credential types in use
-   - **Community packages**: n8n's public REST API does not expose the installed-packages endpoint, so `n8n-cli packages list` returns 404. Ask the user directly: "What community packages do you have installed? Check Settings → Community nodes in your n8n UI." Compare each one against the target version's compatibility list manually.
+   - **Community packages**: n8n's public REST API does not expose the installed-packages endpoint, so `n8n-cli --json packages list` returns 404. Ask the user directly: "What community packages do you have installed? Check Settings → Community nodes in your n8n UI." Compare each one against the target version's compatibility list manually.
 
 4. **Cross-reference**:
 

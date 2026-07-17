@@ -10,12 +10,12 @@ Run a comprehensive status check on the connected n8n instance using `n8n-cli`.
 
 ## Procedure
 
-1. **Health check**: Run `n8n-cli health` to verify connectivity and auth
-2. **Active workflows**: Run `n8n-cli workflows list --active` to show all active workflows
-3. **Recent errors**: Run `n8n-cli executions list --status error --limit 10` to surface recent failures
-4. **Recent successes**: Run `n8n-cli executions list --status success --limit 5` for context
-5. **Credentials**: Run `n8n-cli credentials list` to show available credentials
-6. **Tags**: Run `n8n-cli tags list` to show workflow organization
+1. **Health check**: Run `n8n-cli --json health` to verify connectivity and auth
+2. **Active workflows**: Run `n8n-cli --json workflows list --active` to show all active workflows
+3. **Recent errors**: Run `n8n-cli --json executions list --status error --limit 10` to surface recent failures
+4. **Recent successes**: Run `n8n-cli --json executions list --status success --limit 5` for context
+5. **Credentials**: Run `n8n-cli --json credentials list` to show available credentials
+6. **Tags**: Run `n8n-cli --json tags list` to show workflow organization
 
 ## Output Format
 
