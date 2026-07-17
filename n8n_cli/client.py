@@ -2,21 +2,12 @@
 
 import json
 import ssl
-import sys
 import urllib.error
 import urllib.parse
 import urllib.request
 from typing import Any, Optional
 
-
-class N8nApiError(Exception):
-    """Raised when the n8n API returns an error."""
-
-    def __init__(self, status: int, message: str, body: Any = None):
-        self.status = status
-        self.message = message
-        self.body = body
-        super().__init__(f"HTTP {status}: {message}")
+from .exceptions import N8nApiError, N8nConnectionError
 
 
 class N8nClient:
@@ -89,8 +80,7 @@ class N8nClient:
 
             raise N8nApiError(e.code, msg, err_body) from e
         except urllib.error.URLError as e:
-            print(f"Connection error: {e.reason}", file=sys.stderr)
-            sys.exit(1)
+            raise N8nConnectionError(str(e.reason)) from e
 
     def get(self, path: str, params: Optional[dict] = None) -> Any:
         return self._request("GET", path, params=params)
