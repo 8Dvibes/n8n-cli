@@ -4,6 +4,7 @@ import json
 from typing import Optional
 
 from .client import N8nClient
+from .exceptions import N8nValidationError
 
 
 def list_variables(client: N8nClient, limit: Optional[int] = None, as_json: bool = False) -> None:
@@ -49,12 +50,14 @@ def get_variable(client: N8nClient, variable_id: str, as_json: bool = False) -> 
 
 
 def update_variable(client: N8nClient, variable_id: str, key: Optional[str] = None, value: Optional[str] = None, as_json: bool = False) -> None:
-    """Update a variable."""
+    """Update a variable. Requires at least --key or --value."""
     body = {}
-    if key:
+    if key is not None:
         body["key"] = key
     if value is not None:
         body["value"] = value
+    if not body:
+        raise N8nValidationError("variables update requires --key or --value (or both).")
     result = client.put(f"/variables/{variable_id}", body=body)
     if as_json:
         print(json.dumps(result, indent=2))
