@@ -6,15 +6,15 @@ lightweight HTTP call to the npm registry.
 """
 
 import json
-import os
 import ssl
 import sys
 import tarfile
-import tempfile
 import urllib.request
 from io import BytesIO
 from pathlib import Path
 from typing import Optional
+
+from .exceptions import N8nCatalogError
 
 # Where we store the cached catalog
 CACHE_DIR = Path.home() / ".n8n-cli" / "nodes"
@@ -158,9 +158,10 @@ def ensure_catalog(force: bool = False, quiet: bool = False) -> dict:
             with open(CATALOG_FILE) as f:
                 return json.load(f)
         # No cache and no network -- can't do anything
-        print("Error: Cannot reach npm registry and no cached catalog exists.", file=sys.stderr)
-        print("Check your internet connection or run 'n8n-cli nodes update' when online.", file=sys.stderr)
-        sys.exit(1)
+        raise N8nCatalogError(
+            "Cannot reach npm registry and no cached catalog exists. "
+            "Check your internet connection or run 'n8n-cli nodes update' when online."
+        )
 
     if not needs_update and CATALOG_FILE.exists():
         # Catalog is current
@@ -208,6 +209,18 @@ def ensure_catalog(force: bool = False, quiet: bool = False) -> dict:
                 continue
 
         index[name] = entry
+
+    # Guard: don't persist empty catalog if all downloads failed
+    if not index:
+        if CATALOG_FILE.exists():
+            if not quiet:
+                print("  Warning: downloads failed, using cached catalog", file=sys.stderr)
+            with open(CATALOG_FILE) as f:
+                return json.load(f)
+        raise N8nCatalogError(
+            "Failed to download any node definitions. "
+            "Check your internet connection or try again later."
+        )
 
     catalog = {
         "nodes": index,
@@ -307,8 +320,7 @@ def get_node(node_name: str, full: bool = False, as_json: bool = False) -> None:
                 break
 
     if not node:
-        print(f"Node '{node_name}' not found. Try: n8n-cli nodes search {node_name}", file=sys.stderr)
-        sys.exit(1)
+        raise N8nCatalogError(f"Node '{node_name}' not found. Try: n8n-cli nodes search {node_name}")
 
     if full:
         # Load full definition from the full_definitions file
@@ -323,8 +335,7 @@ def get_node(node_name: str, full: bool = False, as_json: bool = False) -> None:
                     else:
                         print(json.dumps(d, indent=2))
                     return
-        print(f"Full definition not available. Run: n8n-cli nodes update", file=sys.stderr)
-        sys.exit(1)
+        raise N8nCatalogError("Full definition not available. Run: n8n-cli nodes update")
 
     if as_json:
         print(json.dumps(node, indent=2))
