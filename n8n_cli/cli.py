@@ -5,8 +5,9 @@ import json
 import sys
 
 from . import __version__
-from .client import N8nClient, N8nApiError
+from .client import N8nClient
 from .config import get_profile, require_profile, load_config, save_config
+from .exceptions import N8nError, N8nApiError, N8nConfigError
 
 
 def _client(args) -> N8nClient:
@@ -23,30 +24,27 @@ def _json(args) -> bool:
 
 def cmd_health(args):
     client = _client(args)
-    try:
-        # Try listing workflows with limit=1 as a health check
-        resp = client.get("/workflows", params={"limit": 1})
-        profile = get_profile(getattr(args, "profile", None))
-        if _json(args):
-            print(json.dumps({
-                "status": "ok",
-                "profile": profile["profile_name"],
-                "api_url": profile["api_url"],
-                "workflows_accessible": True,
-            }, indent=2))
-        else:
-            print(f"Status:   OK")
-            print(f"Profile:  {profile['profile_name']}")
-            print(f"API URL:  {profile['api_url']}")
-            print(f"Auth:     Valid")
-    except N8nApiError as e:
-        if _json(args):
-            print(json.dumps({"status": "error", "code": e.status, "message": e.message}, indent=2))
-        else:
-            print(f"Status:   ERROR")
-            print(f"Code:     {e.status}")
-            print(f"Message:  {e.message}")
-        sys.exit(1)
+    # Try listing workflows with limit=1 as a health check.
+    # If the API key is invalid or server is down, N8nApiError or
+    # N8nConnectionError propagates to main()'s central handler.
+    client.get("/workflows", params={"limit": 1})
+    profile = get_profile(getattr(args, "profile", None))
+    if _json(args):
+        print(json.dumps({
+            "status": "ok",
+            "profile": profile["profile_name"],
+            "api_url": profile["api_url"],
+            "workflows_accessible": True,
+        }, indent=2))
+    else:
+        from .output import Output
+        out = Output()
+        out.heading("n8n Health Check")
+        out.success("Connected")
+        out.kv("Profile", profile["profile_name"])
+        out.kv("API URL", profile["api_url"])
+        out.kv("Auth", "Valid")
+        out.blank()
 
 
 # ── Discover ─────────────────────────────────────────────────────────
@@ -118,8 +116,7 @@ def cmd_config_list_profiles(args):
 def cmd_config_use(args):
     config = load_config()
     if args.name not in config.get("profiles", {}):
-        print(f"Error: Profile '{args.name}' not found.", file=sys.stderr)
-        sys.exit(1)
+        raise N8nConfigError(f"Profile '{args.name}' not found.")
     config["default_profile"] = args.name
     save_config(config)
     print(f"Now using profile: {args.name}")
@@ -129,8 +126,7 @@ def cmd_config_delete_profile(args):
     config = load_config()
     profiles = config.get("profiles", {})
     if args.name not in profiles:
-        print(f"Error: Profile '{args.name}' not found.", file=sys.stderr)
-        sys.exit(1)
+        raise N8nConfigError(f"Profile '{args.name}' not found.")
     del profiles[args.name]
     if config.get("default_profile") == args.name:
         config["default_profile"] = next(iter(profiles), "default")
@@ -502,6 +498,52 @@ def cmd_workflows_clear_tags(args):
     clear_workflow_tags(_client(args), args.id, as_json=_json(args))
 
 
+# ── Completion ──────────────────────────────────────────────────────
+
+def cmd_completion(args):
+    """Print shell completion script."""
+    from .completions import generate_bash, generate_zsh
+    parser = build_parser()
+    if args.shell == "zsh":
+        print(generate_zsh(parser))
+    else:
+        print(generate_bash(parser))
+
+
+def cmd_workflows_validate(args):
+    from .workflows import validate_workflow
+    validate_workflow(args.file, as_json=_json(args))
+
+
+# ── API (raw escape hatch) ──────────────────────────────────────────
+
+def cmd_api(args):
+    """Raw API call to any n8n REST endpoint.
+
+    This is the escape hatch for endpoints the CLI doesn't cover yet.
+    Useful for AI agents that need full API access without waiting for
+    a dedicated command to be added.
+    """
+    client = _client(args)
+    body = None
+    if args.data:
+        body = json.loads(args.data)
+    elif args.data_file:
+        with open(args.data_file) as f:
+            body = json.load(f)
+
+    result = client._request(
+        args.method.upper(),
+        args.path,
+        body=body,
+    )
+
+    if result is not None:
+        print(json.dumps(result, indent=2))
+    else:
+        print("{}")
+
+
 # ── Parser Builder ───────────────────────────────────────────────────
 
 def build_parser() -> argparse.ArgumentParser:
@@ -622,6 +664,10 @@ def build_parser() -> argparse.ArgumentParser:
     p = wf_sub.add_parser("clear-tags", help="Remove all tags from a workflow")
     p.add_argument("id", help="Workflow ID")
     p.set_defaults(func=cmd_workflows_clear_tags)
+
+    p = wf_sub.add_parser("validate", help="Validate workflow JSON before import")
+    p.add_argument("file", help="JSON file path to validate")
+    p.set_defaults(func=cmd_workflows_validate)
 
     # ── executions ──
     ex = sub.add_parser("executions", aliases=["exec"], help="Execution operations")
@@ -887,6 +933,37 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.set_defaults(func=cmd_skills_doctor)
 
+    # ── completion ──
+    cp = sub.add_parser(
+        "completion",
+        help="Print shell completion script",
+        description="Generate a shell completion script for bash or zsh.",
+    )
+    cp.add_argument(
+        "shell", choices=["bash", "zsh"],
+        help="Shell type (bash or zsh)",
+    )
+    cp.set_defaults(func=cmd_completion)
+
+    # ── api (raw escape hatch) ──
+    ap = sub.add_parser(
+        "api",
+        help="Raw API call to any n8n REST endpoint",
+        description=(
+            "Send a raw HTTP request to the n8n REST API. "
+            "Use this for endpoints the CLI doesn't cover yet."
+        ),
+    )
+    ap.add_argument("path", help="API path (e.g. /workflows, /executions/123)")
+    ap.add_argument(
+        "-X", "--method", default="GET",
+        choices=["GET", "POST", "PUT", "PATCH", "DELETE"],
+        help="HTTP method (default: GET)",
+    )
+    ap.add_argument("-d", "--data", help="JSON request body (inline string)")
+    ap.add_argument("--data-file", help="JSON request body (read from file)")
+    ap.set_defaults(func=cmd_api)
+
     return parser
 
 
@@ -907,10 +984,35 @@ def main():
     try:
         func(args)
     except N8nApiError as e:
+        error_data = {
+            "error": True,
+            "type": "N8nApiError",
+            "status": e.status,
+            "message": e.message,
+        }
+        if e.recovery_hint:
+            error_data["recovery_hint"] = e.recovery_hint
         if _json(args):
-            print(json.dumps({"error": True, "status": e.status, "message": e.message}, indent=2), file=sys.stderr)
+            print(json.dumps(error_data, indent=2), file=sys.stderr)
         else:
             print(f"Error: HTTP {e.status}: {e.message}", file=sys.stderr)
+            if e.recovery_hint:
+                print(f"Hint:  {e.recovery_hint}", file=sys.stderr)
+        sys.exit(1)
+    except N8nError as e:
+        error_data = {
+            "error": True,
+            "type": type(e).__name__,
+            "message": str(e),
+        }
+        if e.recovery_hint:
+            error_data["recovery_hint"] = e.recovery_hint
+        if _json(args):
+            print(json.dumps(error_data, indent=2), file=sys.stderr)
+        else:
+            print(f"Error: {e}", file=sys.stderr)
+            if e.recovery_hint:
+                print(f"Hint:  {e.recovery_hint}", file=sys.stderr)
         sys.exit(1)
     except FileNotFoundError as e:
         print(f"Error: File not found: {e}", file=sys.stderr)

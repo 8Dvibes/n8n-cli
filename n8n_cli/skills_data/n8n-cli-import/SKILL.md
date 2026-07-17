@@ -68,7 +68,7 @@ n8n-cli workflows import <file.json> --activate
 ### Step 5: Verify
 
 ```bash
-n8n-cli workflows get <new-id>
+n8n-cli --json workflows get <new-id>
 ```
 
 ## Output
