@@ -72,7 +72,7 @@ def test_webhook(
         print(f"Workflow:  {wf.get('name')} ({workflow_id})")
         print(f"Webhook:   {webhook_node.get('name')}")
         print(f"Path:      {path}")
-        print(f"Method:    {http_method}")
+        print(f"Method:    {method.upper()}")
         print(f"URL:       {webhook_url}")
         print(f"Sending test request...")
         print()
