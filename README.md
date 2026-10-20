@@ -349,7 +349,7 @@ Config stored at `~/.n8n-cli.json` (mode 600). Environment variables take priori
 | Variable | Description |
 |----------|-------------|
 | `N8N_API_URL` | n8n API base URL |
-| `N8N_API_KEY` | API key |
+| `N8N_API_KEY` | API key (overridden by an explicit `--profile`; the profile's own URL/key are used) |
 | `N8N_PROFILE` | Profile name to use |
 
 ## Why n8n-cli?

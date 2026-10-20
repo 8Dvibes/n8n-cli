@@ -51,9 +51,10 @@ def get_profile(profile_name: Optional[str] = None) -> dict:
     """Resolve the active profile, with env-var overrides.
 
     Priority order:
-    1. Environment variables (N8N_API_URL, N8N_API_KEY)
-    2. Named profile from config file
-    3. default profile from config file
+    1. Explicit profile (``--profile`` flag): that profile's url/key win over
+       N8N_API_URL / N8N_API_KEY (env vars only fill values the profile lacks)
+    2. Environment variables (N8N_API_URL, N8N_API_KEY)
+    3. N8N_PROFILE / default profile from config file
     """
     config = load_config()
 
@@ -61,8 +62,13 @@ def get_profile(profile_name: Optional[str] = None) -> dict:
     profiles = config.get("profiles", {})
     profile = profiles.get(name, {})
 
-    api_url = os.environ.get("N8N_API_URL") or profile.get("api_url", "")
-    api_key = os.environ.get("N8N_API_KEY") or profile.get("api_key", "")
+    if profile_name:
+        # Explicit selection: the chosen profile beats inherited env vars.
+        api_url = profile.get("api_url") or os.environ.get("N8N_API_URL", "")
+        api_key = profile.get("api_key") or os.environ.get("N8N_API_KEY", "")
+    else:
+        api_url = os.environ.get("N8N_API_URL") or profile.get("api_url", "")
+        api_key = os.environ.get("N8N_API_KEY") or profile.get("api_key", "")
 
     if not api_url:
         return {"api_url": "", "api_key": "", "profile_name": name}
