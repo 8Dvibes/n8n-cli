@@ -1,19 +1,19 @@
 ---
-name: n8n-export
-description: "Export individual n8n workflows to JSON files. Selective, single-workflow exports for git or sharing. NOT a full instance backup -- use /n8n-backup for that. Use when saving one workflow to a file."
+name: n8n-cli-export
+description: "Export individual n8n workflows to JSON files. Selective, single-workflow exports for git or sharing. NOT a full instance backup -- use /n8n-cli-backup for that. Use when saving one workflow to a file."
 user_invocable: true
 ---
 
-# /n8n-export — Export n8n Workflows
+# /n8n-cli-export — Export n8n Workflows
 
 Export one or more workflows to JSON files for version control or backup.
 
 ## Arguments
 
-- `/n8n-export <workflow-id>` — Export a single workflow
-- `/n8n-export --all` — Export all workflows
-- `/n8n-export --active` — Export all active workflows
-- `/n8n-export --tag <tag-name>` — Export workflows with a specific tag
+- `/n8n-cli-export <workflow-id>` — Export a single workflow
+- `/n8n-cli-export --all` — Export all workflows
+- `/n8n-cli-export --active` — Export all active workflows
+- `/n8n-cli-export --tag <tag-name>` — Export workflows with a specific tag
 
 ## Procedure
 
@@ -63,5 +63,5 @@ mkdir -p n8n-workflows/
 ## Tips
 
 - Exported JSON includes everything: nodes, connections, settings, credentials (IDs only, no secrets)
-- For migration between instances, use `/n8n-import` on the target instance
+- For migration between instances, use `/n8n-cli-import` on the target instance
 - Credential IDs will need remapping when importing to a different instance

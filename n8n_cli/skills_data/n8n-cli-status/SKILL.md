@@ -1,10 +1,10 @@
 ---
-name: n8n-status
+name: n8n-cli-status
 description: "Check n8n instance health, active workflows, and recent execution stats. Quick overview in one command. Use when checking if n8n is up, reviewing status, or getting an instance summary."
 user_invocable: true
 ---
 
-# /n8n-status — n8n Instance Status & Health Check
+# /n8n-cli-status — n8n Instance Status & Health Check
 
 Run a comprehensive status check on the connected n8n instance using `n8n-cli`.
 

@@ -1,19 +1,19 @@
 ---
-name: n8n-creds
+name: n8n-cli-creds
 description: "Audit n8n credentials and find gaps. Lists what exists, what workflows need, and what is missing. Use when auditing credentials, setting up new workflows, or troubleshooting auth failures."
 user_invocable: true
 ---
 
-# /n8n-creds — Credential Management & Gap Analysis
+# /n8n-cli-creds — Credential Management & Gap Analysis
 
 Audit and manage n8n credentials across workflows.
 
 ## Arguments
 
-- `/n8n-creds` — Full credential audit (what exists, what's used, what's missing)
-- `/n8n-creds check <workflow-id>` — Check if a workflow has all needed credentials
-- `/n8n-creds types` — List all credential types available in n8n
-- `/n8n-creds schema <type>` — Show the schema for a credential type
+- `/n8n-cli-creds` — Full credential audit (what exists, what's used, what's missing)
+- `/n8n-cli-creds check <workflow-id>` — Check if a workflow has all needed credentials
+- `/n8n-cli-creds types` — List all credential types available in n8n
+- `/n8n-cli-creds schema <type>` — Show the schema for a credential type
 
 ## Procedure
 

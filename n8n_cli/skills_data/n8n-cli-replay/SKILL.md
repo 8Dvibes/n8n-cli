@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-replay
-description: "Replay a specific failed n8n execution with its original input data. Reproduces the failure on demand without waiting for the trigger. NOT pattern analysis -- use /n8n-debug for that. Use when reproducing an intermittent bug."
+description: "Replay a specific failed n8n execution with its original input data. Reproduces the failure on demand without waiting for the trigger. NOT pattern analysis -- use /n8n-cli-debug for that. Use when reproducing an intermittent bug."
 user_invocable: true
 ---
 

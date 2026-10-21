@@ -55,6 +55,8 @@ Each subdirectory is a skill (e.g. `n8n-cli-status/SKILL.md`). The `skills.py` m
 
 `pyproject.toml` declares `[tool.setuptools.package-data]` to include `**/*.md` (and any future helper files) inside the wheel. **Do not move the skills out of the package** -- moving them to a repo-root `skills/` directory would break PyPI installs.
 
+**Naming rule:** a skill's directory name, its frontmatter `name:`, and the slash command in its heading and body are the same string (for example `n8n-cli-status` is invoked as `/n8n-cli-status`). `tests/test_skill_names.py` enforces this, including that every `/n8n-cli-*` cross-reference points at a skill that exists.
+
 To add a new skill: drop a new directory under `n8n_cli/skills_data/<skill-name>/` with a `SKILL.md` containing YAML frontmatter (`name`, `description`, `user_invocable: true`). Bump the README skill table and the version in both `pyproject.toml` and `n8n_cli/__init__.py`.
 
 ## Skill design principles

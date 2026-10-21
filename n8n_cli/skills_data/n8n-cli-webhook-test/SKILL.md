@@ -1,18 +1,18 @@
 ---
-name: n8n-webhook-test
+name: n8n-cli-webhook-test
 description: "Fire test requests at n8n webhook endpoints from the terminal. Sends custom or empty payloads and shows the response. Use when testing webhooks, debugging integrations, or verifying triggers."
 user_invocable: true
 ---
 
-# /n8n-webhook-test — Test Webhook Workflows
+# /n8n-cli-webhook-test — Test Webhook Workflows
 
 Fire test requests at webhook-triggered workflows.
 
 ## Arguments
 
-- `/n8n-webhook-test <workflow-id>` — Send empty POST to the workflow's webhook
-- `/n8n-webhook-test <workflow-id> --data '{"key": "value"}'` — Send specific payload
-- `/n8n-webhook-test list` — List all webhook URLs from active workflows
+- `/n8n-cli-webhook-test <workflow-id>` — Send empty POST to the workflow's webhook
+- `/n8n-cli-webhook-test <workflow-id> --data '{"key": "value"}'` — Send specific payload
+- `/n8n-cli-webhook-test list` — List all webhook URLs from active workflows
 
 ## Procedure
 

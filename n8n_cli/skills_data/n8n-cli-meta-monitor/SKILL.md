@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-meta-monitor
-description: "Build a self-monitoring workflow inside n8n that alerts on failures via Slack/Discord/email. Creates an actual n8n workflow -- NOT a CLI watcher (use /n8n-monitor for that). Use when setting up always-on observability."
+description: "Build a self-monitoring workflow inside n8n that alerts on failures via Slack/Discord/email. Creates an actual n8n workflow -- NOT a CLI watcher (use /n8n-cli-monitor for that). Use when setting up always-on observability."
 user_invocable: true
 ---
 

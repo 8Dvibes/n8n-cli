@@ -1,19 +1,19 @@
 ---
-name: n8n-monitor
+name: n8n-cli-monitor
 description: "Poll n8n execution stream from the terminal and surface failures. Runs outside n8n as a CLI watcher. NOT a workflow -- use /n8n-cli-meta-monitor to build an in-n8n alerting workflow. Use when watching for errors live."
 user_invocable: true
 ---
 
-# /n8n-monitor — n8n Execution Monitor
+# /n8n-cli-monitor — n8n Execution Monitor
 
 Watch the n8n execution stream and surface failures with context.
 
 ## Arguments
 
-- `/n8n-monitor` — Check for new errors since last check
-- `/n8n-monitor --watch` — Continuous monitoring (poll every 60s)
-- `/n8n-monitor --workflow-id <id>` — Monitor a specific workflow
-- `/n8n-monitor --slack` — Post failure alerts to Gigawatt Lounge
+- `/n8n-cli-monitor` — Check for new errors since last check
+- `/n8n-cli-monitor --watch` — Continuous monitoring (poll every 60s)
+- `/n8n-cli-monitor --workflow-id <id>` — Monitor a specific workflow
+- `/n8n-cli-monitor --slack` — Post failure alerts to Gigawatt Lounge
 
 ## Procedure
 

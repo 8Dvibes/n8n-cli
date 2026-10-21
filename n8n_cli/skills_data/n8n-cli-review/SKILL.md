@@ -1,6 +1,6 @@
 ---
 name: n8n-cli-review
-description: "Review n8n workflow changes PR-style with risk ratings. Explains what changed, why it matters, and flags dangers. NOT a raw diff -- use /n8n-diff for that. Use when approving changes before production or after a handoff."
+description: "Review n8n workflow changes PR-style with risk ratings. Explains what changed, why it matters, and flags dangers. NOT a raw diff -- use /n8n-cli-diff for that. Use when approving changes before production or after a handoff."
 user_invocable: true
 ---
 

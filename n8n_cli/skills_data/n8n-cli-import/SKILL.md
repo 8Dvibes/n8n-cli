@@ -1,17 +1,17 @@
 ---
-name: n8n-import
+name: n8n-cli-import
 description: "Import n8n workflow JSON with guided credential mapping. Resolves credential references during import. Use when loading workflows from files, repos, or other instances into n8n."
 user_invocable: true
 ---
 
-# /n8n-import — Import n8n Workflow with Credential Mapping
+# /n8n-cli-import — Import n8n Workflow with Credential Mapping
 
 Import a workflow JSON file into n8n with guided credential resolution.
 
 ## Arguments
 
-`/n8n-import <path-to-workflow.json>` — Import a workflow file
-`/n8n-import <path-to-workflow.json> --activate` — Import and activate
+`/n8n-cli-import <path-to-workflow.json>` — Import a workflow file
+`/n8n-cli-import <path-to-workflow.json> --activate` — Import and activate
 
 ## Procedure
 
