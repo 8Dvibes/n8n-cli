@@ -1,17 +1,17 @@
 ---
-name: n8n-migrate
+name: n8n-cli-migrate
 description: "Migrate n8n workflows between instances (cloud to self-hosted or vice versa). Exports, remaps credentials, and imports in one pass. Use when moving workflows across n8n environments."
 user_invocable: true
 ---
 
-# /n8n-migrate — Migrate Workflows Between n8n Instances
+# /n8n-cli-migrate — Migrate Workflows Between n8n Instances
 
 Move workflows from one n8n instance to another with credential remapping.
 
 ## Arguments
 
-- `/n8n-migrate <workflow-id> --from cloud --to hostinger`
-- `/n8n-migrate --all --from cloud --to hostinger`
+- `/n8n-cli-migrate <workflow-id> --from cloud --to hostinger`
+- `/n8n-cli-migrate --all --from cloud --to hostinger`
 
 ## Procedure
 

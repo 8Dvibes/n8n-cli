@@ -1,16 +1,16 @@
 ---
-name: n8n-create
+name: n8n-cli-create
 description: "Build an n8n workflow from an English description. Generates valid JSON and imports it via n8n-cli. Use when creating a new workflow from scratch based on a natural-language spec."
 user_invocable: true
 ---
 
-# /n8n-create — Build n8n Workflow from Description
+# /n8n-cli-create — Build n8n Workflow from Description
 
 Translate a natural language workflow description into n8n workflow JSON and import it.
 
 ## Arguments
 
-`/n8n-create <description of what the workflow should do>`
+`/n8n-cli-create <description of what the workflow should do>`
 
 ## Procedure
 

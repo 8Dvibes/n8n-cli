@@ -1,18 +1,18 @@
 ---
-name: n8n-diff
+name: n8n-cli-diff
 description: "Diff n8n workflow versions side-by-side. Shows structural changes between instances, local files, or backups. NOT a review -- use /n8n-cli-review for risk analysis. Use when checking for drift or auditing what changed."
 user_invocable: true
 ---
 
-# /n8n-diff — Compare n8n Workflows
+# /n8n-cli-diff — Compare n8n Workflows
 
 Diff workflows across instances, against local files, or between versions.
 
 ## Arguments
 
-- `/n8n-diff <workflow-id> --cloud --hostinger` — Compare same workflow across instances
-- `/n8n-diff <workflow-id> --file local.json` — Compare live vs local file
-- `/n8n-diff <workflow-id> --before <backup-dir>` — Compare live vs backup
+- `/n8n-cli-diff <workflow-id> --cloud --hostinger` — Compare same workflow across instances
+- `/n8n-cli-diff <workflow-id> --file local.json` — Compare live vs local file
+- `/n8n-cli-diff <workflow-id> --before <backup-dir>` — Compare live vs backup
 
 ## Procedure
 

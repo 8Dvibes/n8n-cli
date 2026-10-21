@@ -1,18 +1,18 @@
 ---
-name: n8n-backup
-description: "Back up an entire n8n instance to a git-tracked directory. Exports all workflows, credentials, tags, and variables as a snapshot. NOT single-file export -- use /n8n-export for that. Use when creating full instance snapshots."
+name: n8n-cli-backup
+description: "Back up an entire n8n instance to a git-tracked directory. Exports all workflows, credentials, tags, and variables as a snapshot. NOT single-file export -- use /n8n-cli-export for that. Use when creating full instance snapshots."
 user_invocable: true
 ---
 
-# /n8n-backup — Full Instance Backup
+# /n8n-cli-backup — Full Instance Backup
 
 Export everything from an n8n instance to a structured, git-friendly directory.
 
 ## Arguments
 
-- `/n8n-backup` — Backup default profile (cloud)
-- `/n8n-backup --profile hostinger` — Backup specific instance
-- `/n8n-backup --all` — Backup all configured profiles
+- `/n8n-cli-backup` — Backup default profile (cloud)
+- `/n8n-cli-backup --profile hostinger` — Backup specific instance
+- `/n8n-cli-backup --all` — Backup all configured profiles
 
 ## Procedure
 
@@ -81,5 +81,5 @@ Backup complete: <profile>
 
 This skill works well with `/schedule` for automated nightly backups:
 ```
-/schedule "n8n-backup --all" --cron "0 2 * * *"
+/schedule "n8n-cli-backup --all" --cron "0 2 * * *"
 ```

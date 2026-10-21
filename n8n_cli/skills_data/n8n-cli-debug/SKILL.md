@@ -1,18 +1,18 @@
 ---
-name: n8n-debug
+name: n8n-cli-debug
 description: "Analyze failed n8n executions and suggest fixes. Pulls error logs, groups by pattern, and diagnoses root causes. NOT replay -- use /n8n-cli-replay to re-run a specific failure. Use when debugging workflow errors."
 user_invocable: true
 ---
 
-# /n8n-debug — n8n Execution Debugger
+# /n8n-cli-debug — n8n Execution Debugger
 
 Analyze failed executions and suggest fixes using `n8n-cli`.
 
 ## Arguments
 
-- `/n8n-debug` — Analyze all recent errors (last 20)
-- `/n8n-debug <workflow-id>` — Debug a specific workflow's failures
-- `/n8n-debug <execution-id>` — Deep-dive a single execution
+- `/n8n-cli-debug` — Analyze all recent errors (last 20)
+- `/n8n-cli-debug <workflow-id>` — Debug a specific workflow's failures
+- `/n8n-cli-debug <execution-id>` — Deep-dive a single execution
 
 ## Procedure
 
